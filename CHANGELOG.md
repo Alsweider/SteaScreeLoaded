@@ -1,4 +1,10 @@
-# SteaScree Changelog
+# SteaScreeLoaded Changelog
+
+## 1.5.5
+First fork version (SteaScree -> SteaScreeLoaded) aimed at fixing several bugs.
+* The current Steam profile name is now correctly read from localconfig.vdf, with a fallback to the old method.
+* Unused status bar removed.
+* Made compilable for Qt 6.5.3.
 
 ## 1.5.4
 * Qt 5.9.1.
