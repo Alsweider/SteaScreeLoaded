@@ -1,6 +1,6 @@
 # SteaScreeLoaded
 
-SteaScreeLoaded is a fork of the tool SteaScree, which helps to upload screenshots to Steam that were not taken using the Steam overlay. Since the original developer no longer maintains this project, I am attempting to update the program, fix some bugs, and possibly add a few improvements.
+SteaScreeLoaded is a fork of the tool SteaScree, which helps to upload screenshots to Steam that were not taken using the Steam overlay. Since the original developer no longer maintains this project, I am attempting to update the programme, fix some bugs, and possibly add a few improvements.
 
 Download: [Latest release](https://github.com/Alsweider/SteaScreeLoaded/releases/latest)
 
