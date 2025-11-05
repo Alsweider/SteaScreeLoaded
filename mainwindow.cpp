@@ -53,8 +53,11 @@ void MainWindow::bootStrap()
                         << ui->pushButton_addScreenshots << ui->pushButton_prepare);                            // ...in each OS
 
     userIDComboBox = ui->comboBox_userID;
-    QObject::connect(userIDComboBox, static_cast<void(QComboBox::*)(const QString &)>(&QComboBox::activated),
-                     this, &MainWindow::reactToComboBoxActivation);
+    // QObject::connect(userIDComboBox, static_cast<void(QComboBox::*)(const QString &)>(&QComboBox::activated),
+    //                  this, &MainWindow::reactToComboBoxActivation);
+
+    connect(userIDComboBox, &QComboBox::textActivated,
+            this, &MainWindow::reactToComboBoxActivation);
 
     QTreeWidgetDragAndDrop *treeWidget = ui->treeWidget_screenshotList;
     emit sendTreeWidgetPointer(treeWidget);
