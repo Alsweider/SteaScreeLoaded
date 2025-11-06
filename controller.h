@@ -70,7 +70,8 @@ private:
     void getShortcutNames();
     QString getEncodingProcessOfJpeg(QFile *file);
     const QString warningColor = "#ab4e52";
-    const quint32 defaultJpegQuality = 95;
+    const quint32 defaultJpegQuality = 100;
+    QString currentUserID;
 
 
 #if defined(Q_OS_WIN32)
@@ -108,6 +109,7 @@ signals:
     void sendDirStatusLabelsVisible(bool visible);
     void sendUpdateInfo(QString version, QString link);
     void sendJpegQualityValue(quint32 jpegQualityValue);
+    void sendPreviewImage(QPixmap pixmap);
 
 
 public slots:
@@ -128,11 +130,15 @@ public slots:
     void writeSettingNeverOfferUpdate();
     void fillGameIDs(QString userIDCombined);
     void receiveTreeWidgetPointer(QTreeWidgetDragAndDrop *receivedWidget);
+    void loadFirstScreenshotForGame(QString gameID);
+    void onUserIDSelected(const QString &userID);
+
 
 
 private slots:
     void handleUpdate(QNetworkReply *reply);
     void getGameNames(QNetworkReply *reply);
+
 };
 
 #endif // CONTROLLER_H

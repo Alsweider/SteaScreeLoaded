@@ -19,6 +19,7 @@
 #include <QDesktopServices>
 #include <QShortcut>
 #include <QDebug>
+#include <controller.h>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -61,12 +62,48 @@ void MainWindow::bootStrap()
 
     QTreeWidgetDragAndDrop *treeWidget = ui->treeWidget_screenshotList;
     emit sendTreeWidgetPointer(treeWidget);
+
+    connect(ui->comboBox_gameID, &QComboBox::textActivated,
+            this, &MainWindow::onGameSelected);
+
+    connect(ui->comboBox_gameID, &QComboBox::currentTextChanged,
+            controller, &Controller::loadFirstScreenshotForGame);
+
+
+    connect(controller, &Controller::sendPreviewImage,
+            this, &MainWindow::showPreviewImage);
+
+    connect(ui->comboBox_userID, &QComboBox::currentTextChanged,
+            controller, &Controller::onUserIDSelected);
+
+}
+
+
+void MainWindow::showPreviewImage(QPixmap pixmap)
+{
+   // qDebug() << "showPreviewImage aufgerufen";
+    if (pixmap.isNull()) {
+        ui->label_preview->setText("Kein Screenshot gefunden");
+        ui->label_preview->setPixmap(QPixmap());
+        return;
+    }
+
+    ui->label_preview->setPixmap(
+        pixmap.scaled(ui->label_preview->size(),
+                      Qt::KeepAspectRatio,
+                      Qt::SmoothTransformation));
 }
 
 
 void MainWindow::reactToComboBoxActivation(QString userID)
 {
     emit sendNewlySelectedUserID(userID.remove(QRegularExpression(" <.+>$")));
+}
+
+
+void MainWindow::onGameSelected(QString gameID)
+{
+    emit sendNewlySelectedGameID(gameID.remove(QRegularExpression(" <.+>$")));
 }
 
 
@@ -394,3 +431,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
                       ui->spinBox_jpegQuality->value());
     event->accept();
 }
+
+void MainWindow::setController(Controller *ctrl)
+{
+    controller = ctrl;
+    connect(controller, &Controller::sendPreviewImage,
+            this, &MainWindow::showPreviewImage);
+}
+

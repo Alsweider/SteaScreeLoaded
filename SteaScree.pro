@@ -24,7 +24,7 @@ FORMS       +=  mainwindow.ui \
 RESOURCES   +=  \
                 images.qrc
 
-VERSION     =   1.5.5
+VERSION     =   1.6.0
 
 DEFINES     +=  APP_VERSION=\\\"$$VERSION\\\"
 

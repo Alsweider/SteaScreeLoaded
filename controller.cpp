@@ -40,6 +40,9 @@
 #include <QLocale>
 #include <QTime>
 
+#include <QPixmap>
+//#include <QImageReader>
+
 
 Controller::Controller(QObject *parent) : QObject(parent)
 {
@@ -51,15 +54,15 @@ void Controller::bootStrap()
     if ( (os == "Linux") || (os == "macOS") ) {
         isUnixLikeOS = true;
         if ( os == "Linux" ) {
-            settings = new QSettings(QSettings::NativeFormat, QSettings::UserScope, "Foyl", "SteaScree");
+            settings = new QSettings(QSettings::NativeFormat, QSettings::UserScope, "Alsweider", "SteaScreeLoaded");
             defaultSteamDir = QDir::homePath() + "/.steam/steam";
         } else {
-            settings = new QSettings(QSettings::NativeFormat, QSettings::UserScope, "foyl.io", "SteaScree");
+            settings = new QSettings(QSettings::NativeFormat, QSettings::UserScope, "Alsweider", "SteaScreeLoaded");
             defaultSteamDir = QDir::homePath() + "/Library/Application Support/Steam";
         }
     } else {
         isUnixLikeOS = false;
-        settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, "Foyl", "SteaScree");
+        settings = new QSettings(QSettings::IniFormat, QSettings::UserScope, "Alsweider", "SteaScreeLoaded");
         if ( QSysInfo::currentCpuArchitecture() == "x86_64" )
             defaultSteamDir = "C:/Program Files (x86)/Steam";
         else
@@ -79,6 +82,7 @@ void Controller::bootStrap()
         userDataDir = steamDir + "/userdata";
         setUserDataPaths(steamDir);
     }
+
 }
 
 
@@ -283,7 +287,7 @@ QString Controller::getPersonalNameByUserID(QString userID)
         QRegularExpression re("\"PersonaName\"\\s*\"([^\"]+)\"");
         QRegularExpressionMatch match = re.match(content);
         if (match.hasMatch()){
-            qDebug() << "Name gefunden, neue Methode: " << match.captured(1) << Qt::endl;
+            //qDebug() << "Name gefunden, neue Methode: " << match.captured(1) << Qt::endl;
             return " <" + match.captured(1) + ">"; // Gefundener Profilname
         }
     }
@@ -1041,3 +1045,76 @@ void Controller::returnSteamDir()
 {
     emit sendSteamDir(steamDir);
 }
+
+
+void Controller::loadFirstScreenshotForGame(QString gameID)
+{
+    //qDebug() << "loadFirstScreenshotForGame aufgerufen: " << gameID;
+
+    if (currentUserID.isEmpty() || steamDir.isEmpty()){
+        // qDebug() << "currentUserID oder steamDir ist leer!";
+        // qDebug() << "currentUserID:" << currentUserID;
+        // qDebug() << "steamDir:" << steamDir;
+        return;
+    }
+
+    // Nur die führende Zahl extrahieren
+    QRegularExpression re("^(\\d+)");
+    QRegularExpressionMatch match = re.match(gameID);
+
+   // qDebug() << "loadFirstScreenshotForGame match: " << match;
+    if (!match.hasMatch()) {
+        emit sendPreviewImage(QPixmap());
+        return;
+    }
+
+    QString numericGameID = match.captured(1);
+
+    QString path = QString("%1/userdata/%2/760/remote/%3/screenshots")
+                       .arg(steamDir)
+                       .arg(currentUserID)
+                       .arg(numericGameID);
+    //qDebug() << "loadFirstScreenshotForGame QString path: " << path;
+    // qDebug() << "Überprüfe Screenshot-Pfad:" << path;
+    // qDebug() << "SteamDir:" << steamDir;
+    // qDebug() << "currentUserID:" << currentUserID;
+    QDir userdataDir(QString("%1/userdata").arg(steamDir));
+    // qDebug() << "Gefundene UserIDs:" << userdataDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+
+    QDir dir(path);
+    if (!dir.exists()) {
+        // qDebug() << "Screenshot-Ordner existiert nicht:" << path;
+        emit sendPreviewImage(QPixmap());
+        return;
+    }
+
+    QStringList filters = {"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tif", "*.tiff"};
+    QStringList files = dir.entryList(filters, QDir::Files, QDir::Name);
+    // qDebug() << "Gefundene Dateien:" << files;
+
+    if (files.isEmpty()) {
+        emit sendPreviewImage(QPixmap());
+        return;
+    }
+
+    QString firstImagePath = dir.absoluteFilePath(files.first());
+    QPixmap pix(firstImagePath);
+    // qDebug() << "loadFirstScreenshotForGame firstImagePath: " << firstImagePath;
+    emit sendPreviewImage(pix);
+}
+
+
+void Controller::onUserIDSelected(const QString &userID)
+{
+    // userID aus ComboBox kann "12345678" oder "12345678 <Name>" sein
+    QRegularExpression re("^(\\d+)");
+    QRegularExpressionMatch match = re.match(userID);
+    if (match.hasMatch()) {
+        currentUserID = match.captured(1);
+        // qDebug() << "currentUserID gesetzt auf:" << currentUserID;
+    } else {
+        currentUserID.clear();
+        // qDebug() << "Ungültige UserID aus ComboBox:" << userID;
+    }
+}
+

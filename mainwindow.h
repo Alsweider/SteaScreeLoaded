@@ -10,6 +10,8 @@
 #include <QMovie>
 #include <QComboBox>
 
+class Controller;
+
 namespace Ui {
 class MainWindow;
 }
@@ -24,6 +26,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void bootStrap();
+    void setController(Controller *ctrl);
 
 
 protected:
@@ -37,6 +40,8 @@ private:
     void makeWideMessageBox(QMessageBox *msgBox, quint32 width);
     void disableAllControls();
     const QString warningColor = "#ab4e52";
+    Controller *controller = nullptr;
+
 
 
 signals:
@@ -56,6 +61,8 @@ signals:
     void sendNeverOfferUpdate();
     void sendNewlySelectedUserID(QString userID);
     void sendTreeWidgetPointer(QTreeWidgetDragAndDrop *treeWidget);
+    void sendNewlySelectedGameID(QString gameID);
+
 
 
 public slots:
@@ -80,6 +87,9 @@ public slots:
     void setDirStatusLabelsVisible(bool visible);
     void offerUpdate(QString version, QString link);
     void setJpegQualityValue(quint32 jpegQualityValue);
+    void showPreviewImage(QPixmap pixmap);
+    void onGameSelected(QString gameID);
+
 
 
 private slots:
