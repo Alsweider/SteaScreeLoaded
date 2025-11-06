@@ -1,5 +1,11 @@
 # SteaScreeLoaded Changelog
 
+## 1.6.0
+- Image preview: Some games appear in the list only with their ID number. To make folder selection easier, an image is now displayed as soon as a game/ID is selected in the list. The user interface has been rearranged accordingly.
+- Path to the saved settings adjusted to the new programme (fork) name.
+- Default JPEG quality increased from 95 to 100. A value somewhere in the 90s might offer a better balance between quality and file size, and the difference is barely visible to the naked eye, yet JPEG remains lossy even at 100 %. Since the image source is often already compressed, there is little reason to further reduce the quality by default.
+
+
 ## 1.5.5
 First fork version (SteaScree -> SteaScreeLoaded) aimed at fixing several bugs.
 - The current Steam profile names are now read from localconfig.vdf using a new method; the previous method sometimes produced stale/outdated names and is retained only as a safety fallback if the new method fails.
