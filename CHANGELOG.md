@@ -1,5 +1,8 @@
 # SteaScreeLoaded Changelog
 
+## 1.6.1
+User interface more clearly organised
+
 ## 1.6.0
 - Image preview: Some games appear in the list only with their ID number. To make folder selection easier, an image is now displayed as soon as a game/ID is selected in the list. The user interface has been rearranged accordingly.
 - Path to the saved settings adjusted to the new programme (fork) name.
