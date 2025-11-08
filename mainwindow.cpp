@@ -85,25 +85,20 @@ void MainWindow::showPreviewImage(QPixmap pixmap)
     if (pixmap.isNull()) {
         ui->pushButtonPreview->setText("No screenshot found");
         ui->pushButtonPreview->setIcon(QIcon()); // Icon zurücksetzen
+        m_previewOriginal = QPixmap(); //zurücksetzen
         return;
     }
 
-    ui->pushButtonPreview->setIcon(QIcon(pixmap));
-    ui->pushButtonPreview->setIconSize(ui->pushButtonPreview->size());
+    m_previewOriginal = pixmap;
+
+    QPixmap scaled = pixmap.scaled(
+                               ui->pushButtonPreview->size(),
+                               Qt::KeepAspectRatio,
+        Qt::SmoothTransformation);
+
+    ui->pushButtonPreview->setIcon(QIcon(scaled));
+    ui->pushButtonPreview->setIconSize(scaled.size());
     ui->pushButtonPreview->setText(""); //Text entfernen
-
-
-   // // qDebug() << "showPreviewImage aufgerufen";
-   //  if (pixmap.isNull()) {
-   //      ui->label_preview->setText("Kein Screenshot gefunden");
-   //      ui->label_preview->setPixmap(QPixmap());
-   //      return;
-   //  }
-
-   //  ui->label_preview->setPixmap(
-   //      pixmap.scaled(ui->label_preview->size(),
-   //                    Qt::KeepAspectRatio,
-   //                    Qt::SmoothTransformation));
 }
 
 
@@ -473,13 +468,6 @@ void MainWindow::setFooter(){
                          "<a href='https://ko-fi.com/alsweider' style='text-decoration: none;'>Support development</a>"
                          ).arg(APP_NAME, APP_VERSION);
 
-    // QString footer = QString(
-    //                      "<span style='color:grey;'><a href='https://github.com/Alsweider/SteaScreeLoaded' style='color: grey;'>%1</a> v%2 by Alsweider, © 2025, "
-    //                      "<a href='https://www.gnu.org/licenses/gpl-3.0.html' style='color: grey;'>GPL 3.0</a></span>"
-    //                      " – <a href='https://ko-fi.com/alsweider' style='color: grey;'>Support development</a>"
-    //                      ).arg(APP_NAME, APP_VERSION);
-
-
     // Text setzen
     ui->labelFooter->setText(footer);
 
@@ -504,16 +492,6 @@ void MainWindow::openFolderInExplorer(const QString &path) {
 }
 
 
-// void openFolderInExplorer(const QString &path) {
-// #if defined(Q_OS_WIN)
-//     QProcess::startDetached("explorer", QStringList() << QDir::toNativeSeparators(path));
-// #elif defined(Q_OS_LINUX)
-//     QProcess::startDetached("xdg-open", QStringList() << path);
-// #elif defined(Q_OS_MACOS)
-//     QProcess::startDetached("open", QStringList() << path);
-// #endif
-// }
-
 void MainWindow::on_pushButtonPreview_clicked()
 {
     if(controller) {
@@ -522,5 +500,35 @@ void MainWindow::on_pushButtonPreview_clicked()
             controller->openPathInExplorer(path); // Explorer öffnen
         }
     }
+}
+
+
+void MainWindow::updatePreviewIcon()
+{
+    if (ui->pushButtonPreview && !m_previewOriginal.isNull())
+    {
+        QPixmap scaled = m_previewOriginal.scaled(
+            ui->pushButtonPreview->size(),
+            Qt::KeepAspectRatio,
+            Qt::SmoothTransformation);
+
+        ui->pushButtonPreview->setIcon(QIcon(scaled));
+        ui->pushButtonPreview->setIconSize(scaled.size());
+    }
+}
+
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+    updatePreviewIcon();
+}
+
+
+void MainWindow::on_splitter_splitterMoved(int pos, int index)
+{
+    Q_UNUSED(pos)
+    Q_UNUSED(index)
+    updatePreviewIcon();
 }
 

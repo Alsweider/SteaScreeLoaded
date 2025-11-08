@@ -12,6 +12,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QProcess>
+// #include <QIcon>
 
 class Controller;
 
@@ -34,6 +35,7 @@ public:
 
 protected:
     void closeEvent(QCloseEvent *event) Q_DECL_OVERRIDE;
+    void resizeEvent(QResizeEvent *event) override;
 
 
 private:
@@ -45,6 +47,10 @@ private:
     const QString warningColor = "#ab4e52";
     Controller *controller = nullptr;
     void setFooter();
+    QPixmap m_previewOriginal;
+    void updatePreviewIcon();
+
+
 
 signals:
     void sendButtonList(QList<QPushButton*> buttonList);
@@ -104,6 +110,7 @@ private slots:
     void on_pushButton_locateSteamDir_clicked();
     void reactToComboBoxActivation(QString userID);
     void on_pushButtonPreview_clicked();
+    void on_splitter_splitterMoved(int pos, int index);
 };
 
 #endif // MAINWINDOW_H

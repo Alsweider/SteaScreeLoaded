@@ -177,7 +177,7 @@ void Controller::handleUpdate(QNetworkReply *reply)
         QString latestVersion = obj.value("tag_name").toString();
         if (latestVersion.startsWith('v', Qt::CaseInsensitive)) {
             latestVersion.remove(0, 1); // entfernt das erste Zeichen 'v'
-            qDebug() << "latestVersion: " << latestVersion;
+            qDebug() << "latestVersion GitHub: " << latestVersion;
         }
 
         QString appVersion = QCoreApplication::applicationVersion();
