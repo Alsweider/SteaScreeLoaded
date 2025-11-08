@@ -82,17 +82,28 @@ void MainWindow::bootStrap()
 
 void MainWindow::showPreviewImage(QPixmap pixmap)
 {
-   // qDebug() << "showPreviewImage aufgerufen";
     if (pixmap.isNull()) {
-        ui->label_preview->setText("Kein Screenshot gefunden");
-        ui->label_preview->setPixmap(QPixmap());
+        ui->pushButtonPreview->setText("No screenshot found");
+        ui->pushButtonPreview->setIcon(QIcon()); // Icon zurücksetzen
         return;
     }
 
-    ui->label_preview->setPixmap(
-        pixmap.scaled(ui->label_preview->size(),
-                      Qt::KeepAspectRatio,
-                      Qt::SmoothTransformation));
+    ui->pushButtonPreview->setIcon(QIcon(pixmap));
+    ui->pushButtonPreview->setIconSize(ui->pushButtonPreview->size());
+    ui->pushButtonPreview->setText(""); //Text entfernen
+
+
+   // // qDebug() << "showPreviewImage aufgerufen";
+   //  if (pixmap.isNull()) {
+   //      ui->label_preview->setText("Kein Screenshot gefunden");
+   //      ui->label_preview->setPixmap(QPixmap());
+   //      return;
+   //  }
+
+   //  ui->label_preview->setPixmap(
+   //      pixmap.scaled(ui->label_preview->size(),
+   //                    Qt::KeepAspectRatio,
+   //                    Qt::SmoothTransformation));
 }
 
 
@@ -442,26 +453,74 @@ void MainWindow::setController(Controller *ctrl)
 
 void MainWindow::setFooter(){
 
-    // Stilfarbe
-    ui->labelFooter->setStyleSheet("color: grey");
-
-    // Rich-Text mit Link
-    QString footer = QString(
-                         "<span style='color:grey;'><a href='https://github.com/Alsweider/SteaScreeLoaded'>%1</a> v%2 by Alsweider, © 2025, "
-                         "<a href='https://www.gnu.org/licenses/gpl-3.0.html'>GPL 3.0</a></span>"
-                         ).arg(APP_NAME, APP_VERSION);
-    // QString footer = QString(
-    //                      "<span style='color:grey;'>%1 v%2 by <a href='https://github.com/Alsweider/SteaScreeLoaded'>Alsweider</a>, © 2025, "
-    //                      "<a href='https://www.gnu.org/licenses/gpl-3.0.html'>GPL 3.0</a></span>"
-    //                      ).arg(APP_NAME, APP_VERSION);
-
-    // Text setzen
-    ui->labelFooter->setText(footer);
-
     // Links klickbar machen
     ui->labelFooter->setTextFormat(Qt::RichText);
     ui->labelFooter->setTextInteractionFlags(Qt::TextBrowserInteraction);
     ui->labelFooter->setOpenExternalLinks(true);
 
+    // Stilfarbe
+    ui->labelFooter->setStyleSheet("color: grey");
+
+    // Rich-Text mit Links
+    QString footer = QString(
+                         "<span style='color: grey; text-decoration: none;'>"
+                         "<a href='https://github.com/Alsweider/SteaScreeLoaded' style='text-decoration: none;'>%1</a> "
+                         "v%2 by Alsweider, © 2025, "
+                         "<a href='https://www.gnu.org/licenses/gpl-3.0.html' style='text-decoration: none;'>GPL 3.0</a>"
+                         "</span>"
+                         " <br> "
+                         "<a href='https://ko-fi.com/alsweider' style='color: red; text-decoration: none;'>♥ </a>"
+                         "<a href='https://ko-fi.com/alsweider' style='text-decoration: none;'>Support development</a>"
+                         ).arg(APP_NAME, APP_VERSION);
+
+    // QString footer = QString(
+    //                      "<span style='color:grey;'><a href='https://github.com/Alsweider/SteaScreeLoaded' style='color: grey;'>%1</a> v%2 by Alsweider, © 2025, "
+    //                      "<a href='https://www.gnu.org/licenses/gpl-3.0.html' style='color: grey;'>GPL 3.0</a></span>"
+    //                      " – <a href='https://ko-fi.com/alsweider' style='color: grey;'>Support development</a>"
+    //                      ).arg(APP_NAME, APP_VERSION);
+
+
+    // Text setzen
+    ui->labelFooter->setText(footer);
+
+
+
+}
+
+
+void MainWindow::openFolderInExplorer(const QString &path) {
+    if (path.isEmpty()) {
+        qDebug() << "MainWindow: Pfad ist leer!";
+        return;
+    }
+
+#if defined(Q_OS_WIN)
+    QProcess::startDetached("explorer", QStringList() << QDir::toNativeSeparators(path));
+#elif defined(Q_OS_LINUX)
+    QProcess::startDetached("xdg-open", QStringList() << path);
+#elif defined(Q_OS_MACOS)
+    QProcess::startDetached("open", QStringList() << path);
+#endif
+}
+
+
+// void openFolderInExplorer(const QString &path) {
+// #if defined(Q_OS_WIN)
+//     QProcess::startDetached("explorer", QStringList() << QDir::toNativeSeparators(path));
+// #elif defined(Q_OS_LINUX)
+//     QProcess::startDetached("xdg-open", QStringList() << path);
+// #elif defined(Q_OS_MACOS)
+//     QProcess::startDetached("open", QStringList() << path);
+// #endif
+// }
+
+void MainWindow::on_pushButtonPreview_clicked()
+{
+    if(controller) {
+        QString path = controller->getLastSelectedScreenshotPath(); // neuen Getter erstellen
+        if(!path.isEmpty()) {
+            controller->openPathInExplorer(path); // Explorer öffnen
+        }
+    }
 }
 

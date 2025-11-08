@@ -20,6 +20,8 @@ class Controller : public QObject
 public:
     explicit Controller(QObject *parent = 0);
     void bootStrap();
+    QString getLastSelectedScreenshotPath() const;
+
 
 
 private:
@@ -72,6 +74,8 @@ private:
     const QString warningColor = "#ab4e52";
     const quint32 defaultJpegQuality = 100;
     QString currentUserID;
+    QString lastSelectedScreenshotPath;
+
 
 
 #if defined(Q_OS_WIN32)
@@ -110,6 +114,8 @@ signals:
     void sendUpdateInfo(QString version, QString link);
     void sendJpegQualityValue(quint32 jpegQualityValue);
     void sendPreviewImage(QPixmap pixmap);
+    void openPathInExplorer(const QString &path);
+
 
 
 public slots:

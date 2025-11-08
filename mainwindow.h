@@ -9,6 +9,9 @@
 #include <QPushButton>
 #include <QMovie>
 #include <QComboBox>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QProcess>
 
 class Controller;
 
@@ -88,6 +91,8 @@ public slots:
     void setJpegQualityValue(quint32 jpegQualityValue);
     void showPreviewImage(QPixmap pixmap);
     void onGameSelected(QString gameID);
+    void openFolderInExplorer(const QString &path);
+
 
 
 
@@ -98,7 +103,7 @@ private slots:
     void on_pushButton_prepare_clicked();
     void on_pushButton_locateSteamDir_clicked();
     void reactToComboBoxActivation(QString userID);
-
+    void on_pushButtonPreview_clicked();
 };
 
 #endif // MAINWINDOW_H

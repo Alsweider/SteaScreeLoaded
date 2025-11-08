@@ -205,6 +205,7 @@ void Controller::handleUpdate(QNetworkReply *reply)
         qDebug() << "Update check failed:" << reply->errorString();
     }
 
+    //Alter Code vor dem Fork
     // if (reply->error() == QNetworkReply::NoError) {
 
     //     QByteArray raw = reply->readAll();
@@ -1121,9 +1122,11 @@ void Controller::loadFirstScreenshotForGame(QString gameID)
     QString numericGameID = match.captured(1);
 
     QString path = QString("%1/userdata/%2/760/remote/%3/screenshots")
-                       .arg(steamDir)
-                       .arg(currentUserID)
-                       .arg(numericGameID);
+                       .arg(steamDir, currentUserID, numericGameID);
+
+    //Pfad merken für pushButtonPreview
+    lastSelectedScreenshotPath = path;
+
     //qDebug() << "loadFirstScreenshotForGame QString path: " << path;
     // qDebug() << "Überprüfe Screenshot-Pfad:" << path;
     // qDebug() << "SteamDir:" << steamDir;
@@ -1167,4 +1170,11 @@ void Controller::onUserIDSelected(const QString &userID)
         // qDebug() << "Ungültige UserID aus ComboBox:" << userID;
     }
 }
+
+
+QString Controller::getLastSelectedScreenshotPath() const
+{
+    return lastSelectedScreenshotPath;
+}
+
 
