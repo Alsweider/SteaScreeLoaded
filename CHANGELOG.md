@@ -1,5 +1,9 @@
 # SteaScreeLoaded Changelog
 
+## 1.6.2
+- New update feature that retrieves the latest version from GitHub
+- Footer information
+
 ## 1.6.1
 User interface more clearly organised
 
