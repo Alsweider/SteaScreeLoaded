@@ -1,5 +1,8 @@
 # SteaScreeLoaded Changelog
 
+## 1.7.0
+The preview image of the selected game now opens the corresponding screenshot folder when clicked.
+
 ## 1.6.2
 - New update feature that retrieves the latest version from GitHub
 - Footer information
