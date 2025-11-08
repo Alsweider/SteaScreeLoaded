@@ -1,5 +1,9 @@
 # SteaScreeLoaded Changelog
 
+## 1.7.1
+- Preview image resizing corrected. The size of the image button now adjusts dynamically to the window dimensions.
+- A splitter has been added, dividing the user interface vertically into two halves to allow the image size to be modified.
+
 ## 1.7.0
 The preview image of the selected game now opens the corresponding screenshot folder when clicked.
 
