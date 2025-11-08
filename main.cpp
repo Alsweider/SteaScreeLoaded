@@ -45,20 +45,21 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    QByteArray envVar = qgetenv("QTDIR");                       //  check if the app is ran in Qt Creator
+    //Logfile erst mal deaktiviert, später optionales Logging vorgesehen
+    // QByteArray envVar = qgetenv("QTDIR");                       //  check if the app is ran in Qt Creator
 
-    if (envVar.isEmpty()) {
-        QFileInfo appDir(a.applicationDirPath());
-        if (appDir.isWritable()) {
-            logFilePath = a.applicationDirPath() + "/debug.log";    // log to application directory
-        }
-    }
+    // if (envVar.isEmpty()) {
+    //     QFileInfo appDir(a.applicationDirPath());
+    //     if (appDir.isWritable()) {
+    //         logFilePath = a.applicationDirPath() + "/debug.log";    // log to application directory
+    //     }
+    // }
 
     qInstallMessageHandler(customMessageOutput);                // install custom message handler for debugging
 
-    QCoreApplication::setOrganizationName("Foyl");
-    QCoreApplication::setOrganizationDomain("foyl.io");
-    QCoreApplication::setApplicationName("SteaScree");
+    QCoreApplication::setOrganizationName("Alsweider");
+    QCoreApplication::setOrganizationDomain("https://github.com/Alsweider");
+    QCoreApplication::setApplicationName("SteaScreeLoaded");
     QCoreApplication::setApplicationVersion(QString(APP_VERSION));
 
     //Controller *ctrl = new Controller();

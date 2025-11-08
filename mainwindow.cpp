@@ -27,6 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setFooter();
 }
 
 
@@ -146,7 +147,7 @@ void MainWindow::offerUpdate(QString version, QString link)
     QMessageBox msgBox(this);
     msgBox.setIcon(QMessageBox::Question);
     QString text = "New version available.";
-    QString info = "SteaScree version " + version + " is available online. Would you like to download it?";
+    QString info = "SteaScreeLoaded version " + version + " is available online. Would you like to download it?";
     msgBox.setText(text);
     msgBox.setInformativeText(info);
     QPushButton *never = msgBox.addButton("Never", QMessageBox::RejectRole);
@@ -347,7 +348,7 @@ void MainWindow::prepareScreenshots(quint32 addedLines)
 
             QMessageBox msgBox(this);
             msgBox.setIcon(QMessageBox::Information);
-            msgBox.setText("SteaScree has updated the VDF-file.");
+            msgBox.setText("SteaScreeLoaded has updated the VDF-file.");
             msgBox.setInformativeText("Now you can start Steam as usual and upload screenshots to the Steam Cloud.");
             msgBox.exec();
         }
@@ -437,5 +438,30 @@ void MainWindow::setController(Controller *ctrl)
     controller = ctrl;
     connect(controller, &Controller::sendPreviewImage,
             this, &MainWindow::showPreviewImage);
+}
+
+void MainWindow::setFooter(){
+
+    // Stilfarbe
+    ui->labelFooter->setStyleSheet("color: grey");
+
+    // Rich-Text mit Link
+    QString footer = QString(
+                         "<span style='color:grey;'><a href='https://github.com/Alsweider/SteaScreeLoaded'>%1</a> v%2 by Alsweider, © 2025, "
+                         "<a href='https://www.gnu.org/licenses/gpl-3.0.html'>GPL 3.0</a></span>"
+                         ).arg(APP_NAME, APP_VERSION);
+    // QString footer = QString(
+    //                      "<span style='color:grey;'>%1 v%2 by <a href='https://github.com/Alsweider/SteaScreeLoaded'>Alsweider</a>, © 2025, "
+    //                      "<a href='https://www.gnu.org/licenses/gpl-3.0.html'>GPL 3.0</a></span>"
+    //                      ).arg(APP_NAME, APP_VERSION);
+
+    // Text setzen
+    ui->labelFooter->setText(footer);
+
+    // Links klickbar machen
+    ui->labelFooter->setTextFormat(Qt::RichText);
+    ui->labelFooter->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    ui->labelFooter->setOpenExternalLinks(true);
+
 }
 

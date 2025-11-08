@@ -146,32 +146,82 @@ void Controller::writeSettings(QSize size, QPoint pos, QString userID, QString g
 
 void Controller::checkForUpdates()
 {
+    qDebug() << "checkForUpdates() aufgerufen";
     QNetworkAccessManager *nam = new QNetworkAccessManager(this);
+
+    // Header setzen, GitHub API verlangt User-Agent
+    QNetworkRequest request(QUrl("https://api.github.com/repos/Alsweider/SteaScreeLoaded/releases/latest"));
+    request.setRawHeader("User-Agent", "SteaScreeLoaded");
+
     QObject::connect(nam, &QNetworkAccessManager::finished,
                      this, &Controller::handleUpdate);
-    nam->get(QNetworkRequest(QUrl("https://steascree.download/latest/")));
+    nam->get(request);
+
+    //Alter Code vor dem Fork
+    // QNetworkAccessManager *nam = new QNetworkAccessManager(this);
+    // QObject::connect(nam, &QNetworkAccessManager::finished,
+    //                  this, &Controller::handleUpdate);
+    // nam->get(QNetworkRequest(QUrl("https://steascree.download/latest/")));
 }
 
 
 void Controller::handleUpdate(QNetworkReply *reply)
 {
+    qDebug() << "handleUpdate() aufgerufen";
     if (reply->error() == QNetworkReply::NoError) {
-
         QByteArray raw = reply->readAll();
         QJsonDocument doc(QJsonDocument::fromJson(raw));
         QJsonObject obj = doc.object();
 
-        QString appVersion = QCoreApplication::applicationVersion();
-        QString latestVersion = obj.value("version").toString();
+        // Version aus tag_name lesen (GitHub Releases)
+        QString latestVersion = obj.value("tag_name").toString();
+        if (latestVersion.startsWith('v', Qt::CaseInsensitive)) {
+            latestVersion.remove(0, 1); // entfernt das erste Zeichen 'v'
+            qDebug() << "latestVersion: " << latestVersion;
+        }
 
+        QString appVersion = QCoreApplication::applicationVersion();
         QVersionNumber appVersionNumber = QVersionNumber::fromString(appVersion);
         QVersionNumber latestVersionNumber = QVersionNumber::fromString(latestVersion);
 
         if (QVersionNumber::compare(latestVersionNumber, appVersionNumber) > 0) {
-            QString link = obj.value(os.toLower()).toString();
+            QString link;
+
+            // Zuerst die Assets prüfen
+            QJsonArray assets = obj.value("assets").toArray();
+            if (!assets.isEmpty()) {
+                link = assets.at(0).toObject().value("browser_download_url").toString();
+            }
+
+            // Falls keine Assets vorhanden, auf zipball_url zurückgreifen
+            if (link.isEmpty()) {
+                link = obj.value("zipball_url").toString();
+            }
+
+            qDebug() << "Update verfügbar:" << latestVersion << ", Link:" << link;
             emit sendUpdateInfo(latestVersion, link);
         }
+    } else {
+        qDebug() << "Update check failed:" << reply->errorString();
     }
+
+    // if (reply->error() == QNetworkReply::NoError) {
+
+    //     QByteArray raw = reply->readAll();
+    //     QJsonDocument doc(QJsonDocument::fromJson(raw));
+    //     QJsonObject obj = doc.object();
+
+    //     QString appVersion = QCoreApplication::applicationVersion();
+    //     QString latestVersion = obj.value("version").toString();
+
+    //     QVersionNumber appVersionNumber = QVersionNumber::fromString(appVersion);
+    //     QVersionNumber latestVersionNumber = QVersionNumber::fromString(latestVersion);
+
+    //     if (QVersionNumber::compare(latestVersionNumber, appVersionNumber) > 0) {
+    //         QString link = obj.value(os.toLower()).toString();
+    //         emit sendUpdateInfo(latestVersion, link);
+    //     }
+    // }
 }
 
 

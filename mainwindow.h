@@ -41,8 +41,7 @@ private:
     void disableAllControls();
     const QString warningColor = "#ab4e52";
     Controller *controller = nullptr;
-
-
+    void setFooter();
 
 signals:
     void sendButtonList(QList<QPushButton*> buttonList);
