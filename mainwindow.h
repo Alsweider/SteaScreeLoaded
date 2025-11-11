@@ -49,7 +49,12 @@ private:
     void setFooter();
     QPixmap m_previewOriginal;
     void updatePreviewIcon();
-
+    void checkModifiedGameList(const QString &arg1);
+    QMap<QString, QString> loadNameMap() const;
+    void saveName(const QString &id, const QString &name);
+    void updateComboBoxNames();
+    QString progVersion = APP_VERSION;
+    QString progName = APP_NAME;
 
 
 signals:
@@ -111,6 +116,8 @@ private slots:
     void reactToComboBoxActivation(QString userID);
     void on_pushButtonPreview_clicked();
     void on_splitter_splitterMoved(int pos, int index);
+    void on_comboBox_gameID_currentTextChanged(const QString &arg1);
+    void on_pushButtonSaveName_clicked();
 };
 
 #endif // MAINWINDOW_H

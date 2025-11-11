@@ -29,19 +29,12 @@
 #include <QApplication>
 #include <QtMath>
 #include <QVersionNumber>
-
 #include <QDebug>
-
-#include <QApplication>
 #include <QtGlobal>
 #include <QtDebug>
-#include <QTextStream>
-//#include <QTextCodec>
 #include <QLocale>
 #include <QTime>
-
 #include <QPixmap>
-//#include <QImageReader>
 
 
 Controller::Controller(QObject *parent) : QObject(parent)
@@ -156,12 +149,6 @@ void Controller::checkForUpdates()
     QObject::connect(nam, &QNetworkAccessManager::finished,
                      this, &Controller::handleUpdate);
     nam->get(request);
-
-    //Alter Code vor dem Fork
-    // QNetworkAccessManager *nam = new QNetworkAccessManager(this);
-    // QObject::connect(nam, &QNetworkAccessManager::finished,
-    //                  this, &Controller::handleUpdate);
-    // nam->get(QNetworkRequest(QUrl("https://steascree.download/latest/")));
 }
 
 
@@ -205,24 +192,6 @@ void Controller::handleUpdate(QNetworkReply *reply)
         qDebug() << "Update check failed:" << reply->errorString();
     }
 
-    //Alter Code vor dem Fork
-    // if (reply->error() == QNetworkReply::NoError) {
-
-    //     QByteArray raw = reply->readAll();
-    //     QJsonDocument doc(QJsonDocument::fromJson(raw));
-    //     QJsonObject obj = doc.object();
-
-    //     QString appVersion = QCoreApplication::applicationVersion();
-    //     QString latestVersion = obj.value("version").toString();
-
-    //     QVersionNumber appVersionNumber = QVersionNumber::fromString(appVersion);
-    //     QVersionNumber latestVersionNumber = QVersionNumber::fromString(latestVersion);
-
-    //     if (QVersionNumber::compare(latestVersionNumber, appVersionNumber) > 0) {
-    //         QString link = obj.value(os.toLower()).toString();
-    //         emit sendUpdateInfo(latestVersion, link);
-    //     }
-    // }
 }
 
 
@@ -338,7 +307,7 @@ QString Controller::getPersonalNameByUserID(QString userID)
         QRegularExpression re("\"PersonaName\"\\s*\"([^\"]+)\"");
         QRegularExpressionMatch match = re.match(content);
         if (match.hasMatch()){
-            //qDebug() << "Name gefunden, neue Methode: " << match.captured(1) << Qt::endl;
+            qDebug() << "Name gefunden, neue Methode: " << match.captured(1) << Qt::endl;
             return " <" + match.captured(1) + ">"; // Gefundener Profilname
         }
     }
@@ -379,51 +348,6 @@ QString Controller::getPersonalNameByUserID(QString userID)
 }
 
 
-//Veraltete Suche nach Benutzername, config.cfg evtl. nicht mehr aktuell
-// QString Controller::getPersonalNameByUserID(QString userID)
-// {
-//     QStringList configFiles;
-
-//     {
-//         QDirIterator i(userDataDir + "/" + userID, QStringList() << "config.cfg", QDir::Files, QDirIterator::Subdirectories);
-//         while ( i.hasNext() ) {
-
-//             configFiles << i.next();
-//         }
-//     }
-
-//     QListIterator<QString> i(configFiles);
-//     while ( i.hasNext() ) {
-//         QString current = i.next();
-
-//         QFile vdf(current);
-//         vdf.open(QIODevice::ReadOnly | QIODevice::Text);
-//         QTextStream text(&vdf);
-//         QStringList lines;
-
-//         while ( !text.atEnd() ) {
-//             QString line = text.readLine();
-
-//             lines << line;
-//         }
-
-//         vdf.close();
-
-//         QRegularExpression re("^name \"(?<name>.+)\"$");
-//         int pos = lines.indexOf(re);
-
-//         QRegularExpressionMatch matchNew;
-
-//         if ( pos != -1 && (lines[pos].contains(re, &matchNew)) ) {
-
-//             return " <" + matchNew.captured("name") + ">";
-//         }
-//     }
-
-//     return "";
-// }
-
-
 void Controller::getGameNames(QNetworkReply *reply)
 {
     if ( games.isEmpty() ) {
@@ -441,13 +365,6 @@ void Controller::getGameNames(QNetworkReply *reply)
                 games[appID] = name;
             }
 
-            // //"Do not use foreach with containers which are not implicitly shared" (Alte Schleife, Gefahr von ungewollten Kopien)
-            // foreach (QJsonValue app, apps) {
-            //     QJsonObject obj = app.toObject();
-            //     QString appID = QString::number(static_cast<quint32>(obj.value("appid").toDouble()));
-            //     QString name = obj.value("name").toString();
-            //     games[appID] = name;
-            // }
         }
     }
 

@@ -256,6 +256,12 @@ void MainWindow::insertIntoComboBox(QString name, QStringList items)
 {
     QComboBox *comboBox = this->findChild<QComboBox*>(name);
     comboBox->insertItems(0, items);
+
+    //Beim Start vorhandene IDs mit Namen aus Datei ergänzen:
+    updateComboBoxNames();
+
+    //prüfe aktuell gewählten Eintrag auf benutzerdefinierten Namen
+    checkModifiedGameList(ui->comboBox_gameID->currentText());
 }
 
 
@@ -466,7 +472,7 @@ void MainWindow::setFooter(){
                          " <br> "
                          "<a href='https://ko-fi.com/alsweider' style='color: red; text-decoration: none;'>♥ </a>"
                          "<a href='https://ko-fi.com/alsweider' style='text-decoration: none;'>Support development</a>"
-                         ).arg(APP_NAME, APP_VERSION);
+                         ).arg(progName, progVersion);
 
     // Text setzen
     ui->labelFooter->setText(footer);
@@ -530,5 +536,142 @@ void MainWindow::on_splitter_splitterMoved(int pos, int index)
     Q_UNUSED(pos)
     Q_UNUSED(index)
     updatePreviewIcon();
+}
+
+
+void MainWindow::on_comboBox_gameID_currentTextChanged(const QString &arg1)
+{
+    checkModifiedGameList(arg1);
+}
+
+
+void MainWindow::on_pushButtonSaveName_clicked()
+{
+    QString id = ui->lineEditGameID->text().trimmed();
+    QString name = ui->lineEditGameName->text().trimmed();
+
+    if (id.isEmpty())
+        return;
+
+    saveName(id, name);
+
+    // ComboBox-Text aktualisieren
+    int idx = ui->comboBox_gameID->currentIndex();
+    if (!name.isEmpty())
+        ui->comboBox_gameID->setItemText(idx, id + " <" + name + ">");
+    else
+        ui->comboBox_gameID->setItemText(idx, id);
+
+    // QMessageBox::information(this, "Saved", "New name has been saved to local file: ids.txt");
+    // Nachricht mit zusätzlichem Knopf
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle("Saved");
+    msgBox.setText("New name has been saved to local file: ids.txt");
+
+    msgBox.addButton(QMessageBox::Ok);
+    QPushButton *openButton = msgBox.addButton("Open .txt", QMessageBox::ActionRole);
+
+    msgBox.exec();
+
+    if (msgBox.clickedButton() == openButton) {
+        QFileInfo fi("ids.txt");
+        if (fi.exists())
+            QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
+    }
+}
+
+
+void MainWindow::checkModifiedGameList(const QString &arg1)
+{
+    static const QRegularExpression rx(R"(^\s*(\d+)(?:\s*<([^>]+)>)?\s*$)");
+    QRegularExpressionMatch m = rx.match(arg1);
+    if (!m.hasMatch())
+        return;
+
+    QString id = m.captured(1);
+    QString name = m.captured(2);
+
+    ui->lineEditGameID->setText(id);
+    ui->lineEditGameID->setReadOnly(true);
+
+    // Wenn kein Name in den spitzen Klammern steht:
+    if (name.isEmpty()) {
+        QMap<QString, QString> map = loadNameMap();
+        if (map.contains(id)) {
+            name = map.value(id);
+
+            // -> ComboBox-Text automatisch ergänzen
+            int idx = ui->comboBox_gameID->currentIndex();
+            if (idx >= 0)
+                ui->comboBox_gameID->setItemText(idx, id + " <" + name + ">");
+        }
+    }
+
+    ui->lineEditGameName->setText(name);
+}
+
+// Datei mit gespeicherten ID->Name Paaren laden
+QMap<QString, QString> MainWindow::loadNameMap() const
+{
+    QMap<QString, QString> map;
+    QFile file("ids.txt");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return map;
+
+    QTextStream in(&file);
+    while (!in.atEnd()) {
+        const QString line = in.readLine().trimmed();
+        if (line.isEmpty() || !line.contains('='))
+            continue;
+        const QStringList parts = line.split('=');
+        if (parts.size() == 2)
+            map.insert(parts[0].trimmed(), parts[1].trimmed());
+    }
+    return map;
+
+    qDebug() << "ids.txt geladen: " << map;
+}
+
+
+void MainWindow::saveName(const QString &id, const QString &name)
+{
+    QMap<QString, QString> map = loadNameMap();
+    map[id] = name;
+
+    QFile file("ids.txt");
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+    for (auto it = map.begin(); it != map.end(); ++it)
+        out << it.key() << "=" << it.value() << "\n";
+
+    qDebug() << "ids.txt gespeichert: " << map;
+
+}
+
+
+// Spieleliste mit benutzerdefinierten Namen abgleichen
+void MainWindow::updateComboBoxNames()
+{
+    QMap<QString, QString> map = loadNameMap();
+
+    for (int i = 0; i < ui->comboBox_gameID->count(); ++i) {
+        QString text = ui->comboBox_gameID->itemText(i);
+
+        static const QRegularExpression rx(R"(^\s*(\d+)(?:\s*<([^>]+)>)?\s*$)");
+        QRegularExpressionMatch m = rx.match(text);
+        if (!m.hasMatch())
+            continue;
+
+        QString id = m.captured(1);
+        QString name = m.captured(2);
+
+        // Wenn kein Name vorhanden ist, prüfen wir die gespeicherte Liste
+        if (name.isEmpty() && map.contains(id)) {
+            name = map.value(id);
+            ui->comboBox_gameID->setItemText(i, id + " <" + name + ">");
+        }
+    }
 }
 
