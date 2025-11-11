@@ -1,5 +1,11 @@
 # SteaScreeLoaded Changelog
 
+## 1.8.0
+**Renaming feature added: No more unnamed games.**
+Non-Steam games added as shortcuts in the Steam client often appear in the list without a name. The same applies to games that no longer exist on Steam under their original ID. To address this, a new feature now allows you to assign names to previously unnamed game IDs. Custom names are stored locally in the file `ids.txt`. When the programme starts, all IDs are checked against this list and are automatically given their assigned names.
+
+![2025-11-11 09_20_22-Greenshot](https://github.com/user-attachments/assets/0cec3edd-7951-424e-8842-631b22396a05)
+
 ## 1.7.1
 - Preview image resizing corrected. The size of the image button now adjusts dynamically to the window dimensions.
 - A splitter has been added, dividing the user interface vertically into two halves to allow the image size to be modified.
