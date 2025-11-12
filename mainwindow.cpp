@@ -20,6 +20,8 @@
 #include <QShortcut>
 #include <QDebug>
 #include <controller.h>
+#include <QCompleter>
+
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -77,6 +79,12 @@ void MainWindow::bootStrap()
     connect(ui->comboBox_userID, &QComboBox::currentTextChanged,
             controller, &Controller::onUserIDSelected);
 
+    // Autovervollständigung für Spielnamen aktivieren
+    QCompleter *completer = new QCompleter(ui->comboBox_gameID->model(), this);
+    completer->setCaseSensitivity(Qt::CaseInsensitive);    // Groß-/Kleinschreibung ignorieren
+    completer->setFilterMode(Qt::MatchContains);           // auch Teiltreffer in der Mitte erlauben
+    completer->setCompletionMode(QCompleter::PopupCompletion); // Vorschläge in Dropdown anzeigen
+    ui->comboBox_gameID->setCompleter(completer);
 }
 
 
@@ -708,7 +716,7 @@ void MainWindow::showPreviewCount(int currentIndex, int totalCount)
         ui->label_previewCount->setText("No Screenshots found");
     else
         ui->label_previewCount->setText(
-            QString("Screenshot %1 von %2").arg(currentIndex).arg(totalCount));
+            QString("Screenshot %1 of %2").arg(currentIndex).arg(totalCount));
 }
 
 

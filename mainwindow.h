@@ -12,7 +12,6 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QProcess>
-// #include <QIcon>
 
 class Controller;
 
