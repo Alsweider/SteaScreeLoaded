@@ -1067,10 +1067,15 @@ void Controller::loadFirstScreenshotForGame(QString gameID)
         return;
     }
 
+    // Bilderliste speichern
+    m_screenshotFiles = files;
+    m_currentScreenshotIndex = 0;
+
     QString firstImagePath = dir.absoluteFilePath(files.first());
     QPixmap pix(firstImagePath);
     // qDebug() << "loadFirstScreenshotForGame firstImagePath: " << firstImagePath;
     emit sendPreviewImage(pix);
+    emit sendPreviewCount(m_currentScreenshotIndex + 1, m_screenshotFiles.size());
 }
 
 
@@ -1092,6 +1097,37 @@ void Controller::onUserIDSelected(const QString &userID)
 QString Controller::getLastSelectedScreenshotPath() const
 {
     return lastSelectedScreenshotPath;
+}
+
+
+void Controller::showNextScreenshot()
+{
+    if (lastSelectedScreenshotPath.isEmpty() || m_screenshotFiles.isEmpty())
+        return;
+
+    if (m_currentScreenshotIndex + 1 < m_screenshotFiles.size())
+        m_currentScreenshotIndex++;
+    else
+        m_currentScreenshotIndex = 0; // wieder von vorn beginnen
+
+    QString nextImagePath = QDir(lastSelectedScreenshotPath).absoluteFilePath(m_screenshotFiles[m_currentScreenshotIndex]);
+    emit sendPreviewImage(QPixmap(nextImagePath));
+    emit sendPreviewCount(m_currentScreenshotIndex + 1, m_screenshotFiles.size());
+}
+
+void Controller::showPreviousScreenshot()
+{
+    if (lastSelectedScreenshotPath.isEmpty() || m_screenshotFiles.isEmpty())
+        return;
+
+    if (m_currentScreenshotIndex - 1 >= 0)
+        m_currentScreenshotIndex--;
+    else
+        m_currentScreenshotIndex = m_screenshotFiles.size() - 1; // zum letzten Bild springen
+
+    QString prevImagePath = QDir(lastSelectedScreenshotPath).absoluteFilePath(m_screenshotFiles[m_currentScreenshotIndex]);
+    emit sendPreviewImage(QPixmap(prevImagePath));
+    emit sendPreviewCount(m_currentScreenshotIndex + 1, m_screenshotFiles.size());
 }
 
 

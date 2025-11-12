@@ -103,8 +103,7 @@ public slots:
     void showPreviewImage(QPixmap pixmap);
     void onGameSelected(QString gameID);
     void openFolderInExplorer(const QString &path);
-
-
+    void showPreviewCount(int currentIndex, int totalCount);
 
 
 private slots:
@@ -118,6 +117,8 @@ private slots:
     void on_splitter_splitterMoved(int pos, int index);
     void on_comboBox_gameID_currentTextChanged(const QString &arg1);
     void on_pushButtonSaveName_clicked();
+    void on_pushButtonLeft_clicked();
+    void on_pushButtonRight_clicked();
 };
 
 #endif // MAINWINDOW_H

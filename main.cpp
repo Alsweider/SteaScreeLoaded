@@ -195,6 +195,10 @@ int main(int argc, char *argv[])
     QObject::connect(c, &Controller::openPathInExplorer,
             &w, &MainWindow::openFolderInExplorer);
 
+    QObject::connect(c, &Controller::sendPreviewCount,
+            &w, &MainWindow::showPreviewCount);
+
+
 
     w.bootStrap();
     c->bootStrap();

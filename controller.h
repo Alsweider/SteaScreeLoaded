@@ -75,6 +75,8 @@ private:
     const quint32 defaultJpegQuality = 100;
     QString currentUserID;
     QString lastSelectedScreenshotPath;
+    QStringList m_screenshotFiles;
+    int m_currentScreenshotIndex = 0;
 
 
 
@@ -113,9 +115,9 @@ signals:
     void sendDirStatusLabelsVisible(bool visible);
     void sendUpdateInfo(QString version, QString link);
     void sendJpegQualityValue(quint32 jpegQualityValue);
-    void sendPreviewImage(QPixmap pixmap);
     void openPathInExplorer(const QString &path);
-
+    void sendPreviewImage(QPixmap pixmap);
+    void sendPreviewCount(int currentIndex, int totalCount);
 
 
 public slots:
@@ -138,6 +140,8 @@ public slots:
     void receiveTreeWidgetPointer(QTreeWidgetDragAndDrop *receivedWidget);
     void loadFirstScreenshotForGame(QString gameID);
     void onUserIDSelected(const QString &userID);
+    void showNextScreenshot();
+    void showPreviousScreenshot();
 
 
 

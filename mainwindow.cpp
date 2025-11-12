@@ -542,6 +542,18 @@ void MainWindow::on_splitter_splitterMoved(int pos, int index)
 void MainWindow::on_comboBox_gameID_currentTextChanged(const QString &arg1)
 {
     checkModifiedGameList(arg1);
+
+    // Titel der Screenshot-GroupBox aktualisieren
+    QString title = arg1;
+
+    // nur Spielname ohne ID anzeigen
+    QRegularExpression re(R"(^\s*(\d+)\s*<([^>]+)>\s*$)");
+    QRegularExpressionMatch match = re.match(arg1);
+    if (match.hasMatch()) {
+        title = match.captured(2); // nur der Name in < >
+    }
+
+    ui->groupBoxJpegQuality->setTitle(QString("Selected game: %1").arg(title));
 }
 
 
@@ -674,4 +686,29 @@ void MainWindow::updateComboBoxNames()
         }
     }
 }
+
+
+void MainWindow::on_pushButtonLeft_clicked()
+{
+    if (controller)
+        controller->showPreviousScreenshot();
+}
+
+
+void MainWindow::on_pushButtonRight_clicked()
+{
+    if (controller)
+        controller->showNextScreenshot();
+}
+
+
+void MainWindow::showPreviewCount(int currentIndex, int totalCount)
+{
+    if (totalCount <= 0)
+        ui->label_previewCount->setText("No Screenshots found");
+    else
+        ui->label_previewCount->setText(
+            QString("Screenshot %1 von %2").arg(currentIndex).arg(totalCount));
+}
+
 
