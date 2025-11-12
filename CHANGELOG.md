@@ -1,5 +1,8 @@
 # SteaScreeLoaded Changelog
 
+## 1.10.0
+Autocomplete added for the Game ID input field. As soon as a game or ID is typed, matching entries from the list are immediately suggested for selection.
+
 ## 1.9.0
 - Arrow buttons for navigating the preview image added
 - The preview header displays the title of the selected game
