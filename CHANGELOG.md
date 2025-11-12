@@ -1,5 +1,11 @@
 # SteaScreeLoaded Changelog
 
+## 1.9.0
+- Arrow buttons for navigating the preview image added
+- The preview header displays the title of the selected game
+- Below the preview image, the total number of screenshots in the selected folder and the index of the currently shown image are displayed
+![2025-11-12 10_17_13-SteaScreeLoaded](https://github.com/user-attachments/assets/a11a6686-c55d-4d25-bec5-7daea601e3dd)
+
 ## 1.8.0
 **Renaming feature added: No more unnamed games.**
 Non-Steam games added as shortcuts in the Steam client often appear in the list without a name. The same applies to games that no longer exist on Steam under their original ID. To address this, a new feature now allows you to assign names to previously unnamed game IDs. Custom names are stored locally in the file `ids.txt`. When the programme starts, all IDs are checked against this list and are automatically given their assigned names.
