@@ -1,5 +1,8 @@
 # SteaScreeLoaded Changelog
 
+## 1.10.1
+Steam API requests have been switched from http to https. This is the officially recommended option and offers a degree of protection against interception, falsification, and manipulation of connection data through encryption of data transmission.
+
 ## 1.10.0
 Autocomplete added for the Game ID input field. As soon as a game or ID is typed, matching entries from the list are immediately suggested for selection.
 
