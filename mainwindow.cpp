@@ -647,9 +647,8 @@ QMap<QString, QString> MainWindow::loadNameMap() const
         if (parts.size() == 2)
             map.insert(parts[0].trimmed(), parts[1].trimmed());
     }
-    return map;
-
     qDebug() << "ids.txt geladen: " << map;
+    return map;
 }
 
 

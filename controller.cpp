@@ -282,7 +282,7 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
             QObject::connect(nam, &QNetworkAccessManager::finished,
                              this, &Controller::getGameNames);
 
-            nam->get(QNetworkRequest(QUrl("http://api.steampowered.com/ISteamApps/GetAppList/v2")));
+            nam->get(QNetworkRequest(QUrl("https://api.steampowered.com/ISteamApps/GetAppList/v2")));
 
         } else {
             emit sendLabelsOnMissingStuff(false, vdfFilename);
