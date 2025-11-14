@@ -4,7 +4,7 @@ SteaScreeLoaded is a fork of the tool SteaScree, which helps to upload screensho
 
 Download: [Latest release](https://github.com/Alsweider/SteaScreeLoaded/releases/latest)
 
-![2025-11-12 10_20_07-SteaScreeLoaded](https://github.com/user-attachments/assets/c4af93c6-b0fa-4d27-a651-341becfc761d)
+![2025-11-14 17_24_09-SteaScreeLoaded](https://github.com/user-attachments/assets/1813f151-5417-4705-b9b1-a947e772a390)
 
 # Support development
 
