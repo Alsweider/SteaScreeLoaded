@@ -77,6 +77,7 @@ private:
     QString lastSelectedScreenshotPath;
     QStringList m_screenshotFiles;
     int m_currentScreenshotIndex = 0;
+    QString apiKey;
 
 
 
@@ -142,12 +143,16 @@ public slots:
     void onUserIDSelected(const QString &userID);
     void showNextScreenshot();
     void showPreviousScreenshot();
+    void setApiKey(QString key);
+
 
 
 
 private slots:
     void handleUpdate(QNetworkReply *reply);
-    void getGameNames(QNetworkReply *reply);
+    void getGameNamesV2(QNetworkReply *reply);
+    void getGameNamesV1(QNetworkReply *reply);
+
 
 };
 

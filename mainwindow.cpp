@@ -719,3 +719,13 @@ void MainWindow::showPreviewCount(int currentIndex, int totalCount)
 }
 
 
+
+void MainWindow::on_pushButtonApiKey_clicked()
+{
+    if (controller)
+            controller->setApiKey(ui->lineEditApiKey->text());
+
+    ui->lineEditApiKey->clear();
+    ui->lineEditApiKey->setPlaceholderText("Key set, please restart.");
+}
+

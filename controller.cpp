@@ -35,6 +35,7 @@
 #include <QLocale>
 #include <QTime>
 #include <QPixmap>
+#include <QUrlQuery>
 
 
 Controller::Controller(QObject *parent) : QObject(parent)
@@ -98,6 +99,7 @@ void Controller::readSettings()
     lastSelectedScreenshotDir = settings->value("Screenshots", QDir::currentPath()).toString();
     lastSelectedUserID = settings->value("UserID").toString();
     lastSelectedGameID = settings->value("GameID").toString();
+    apiKey = settings->value("ApiKey").toString();
     quint32 jpegQuality = settings->value("JPEGQuality").toInt();
     if (jpegQuality < 1 || jpegQuality > 100)
         jpegQuality = defaultJpegQuality;
@@ -111,6 +113,7 @@ void Controller::readSettings()
     settings->beginGroup("Update");
     offerUpdateSetting = settings->value("Offer").toString();
     settings->endGroup();
+
 }
 
 
@@ -129,6 +132,7 @@ void Controller::writeSettings(QSize size, QPoint pos, QString userID, QString g
     if ( !gameID.isEmpty() )
         settings->setValue("GameID", gameID);
     settings->setValue("JPEGQuality", jpegQuality);
+    settings->setValue("ApiKey", apiKey);
     settings->endGroup();
 
     settings->beginGroup("Screenshots");
@@ -279,10 +283,36 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
 
             QNetworkAccessManager *nam = new QNetworkAccessManager(this);
 
-            QObject::connect(nam, &QNetworkAccessManager::finished,
-                             this, &Controller::getGameNames);
+                if (!apiKey.isEmpty()) {
+                    // Mit API-Key: V1-Endpoint
+                    qDebug() << "API-Key gefunden: " << apiKey << " Verwende GetAppList/v1.";
 
-            nam->get(QNetworkRequest(QUrl("https://api.steampowered.com/ISteamApps/GetAppList/v2")));
+                    // http://api.steampowered.com/<interface name>/<method name>/v<version>/?key=<api key>&format=<format>
+                    QUrl url("https://api.steampowered.com/IStoreService/GetAppList/v1/");
+                    QUrlQuery query;
+                    query.addQueryItem("key", apiKey);
+                    query.addQueryItem("format", "json");
+                    query.addQueryItem("max_results", "1000000");
+                    query.addQueryItem("last_appid", "0");
+                    url.setQuery(query);
+
+                    QObject::connect(nam, &QNetworkAccessManager::finished,
+                                     this, &Controller::getGameNamesV1);
+                    nam->get(QNetworkRequest(url));
+                } else {
+                    // Ohne API-Key: V2-Endpoint
+                    qDebug() << "Kein API-Key gefunden, verwende GetAppList/v2";
+                    QUrl url("https://api.steampowered.com/ISteamApps/GetAppList/v2");
+                    QObject::connect(nam, &QNetworkAccessManager::finished,
+                                     this, &Controller::getGameNamesV2);
+                    nam->get(QNetworkRequest(url));
+                }
+
+            // QObject::connect(nam, &QNetworkAccessManager::finished,
+            //                  this, &Controller::getGameNames);
+
+            //nam->get(QNetworkRequest(QUrl("https://api.steampowered.com/ISteamApps/GetAppList/v2")));
+
 
         } else {
             emit sendLabelsOnMissingStuff(false, vdfFilename);
@@ -347,8 +377,34 @@ QString Controller::getPersonalNameByUserID(QString userID)
     return QString();
 }
 
+//GetAppList/v1
+void Controller::getGameNamesV1(QNetworkReply *reply)
+{
+    if (games.isEmpty()) {
 
-void Controller::getGameNames(QNetworkReply *reply)
+        if (reply->error() == QNetworkReply::NoError) {
+
+            QByteArray raw = reply->readAll();
+            QJsonDocument doc = QJsonDocument::fromJson(raw);
+
+            QJsonArray apps = doc.object().value("response").toObject().value("apps").toArray();
+
+            for (int i = 0; i < apps.size(); ++i) {
+                QJsonObject obj = apps[i].toObject();
+                QString appID = QString::number(static_cast<quint32>(obj.value("appid").toDouble()));
+                QString name = obj.value("name").toString();
+                games[appID] = name;
+            }
+        }
+    }
+
+    fillGameIDs(userID);
+}
+
+
+
+//GetAppList/v2
+void Controller::getGameNamesV2(QNetworkReply *reply)
 {
     if ( games.isEmpty() ) {
 
@@ -1130,4 +1186,12 @@ void Controller::showPreviousScreenshot()
     emit sendPreviewCount(m_currentScreenshotIndex + 1, m_screenshotFiles.size());
 }
 
+void Controller::setApiKey(QString key){
+    apiKey = key;
 
+    if (settings) {
+        settings->beginGroup("LastSelection");
+        settings->setValue("ApiKey", apiKey);
+        settings->endGroup();
+    }
+}
