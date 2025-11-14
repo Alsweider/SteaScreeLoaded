@@ -64,10 +64,10 @@ void Controller::bootStrap()
     }
 
     readSettings(); // read settings from the file, if any
-    if ( offerUpdateSetting != "Never" )
+    if (offerUpdateSetting != "Never")
         checkForUpdates();
 
-    if ( !screenshotPathsPool.isEmpty() ) {
+    if (!screenshotPathsPool.isEmpty()) {
         populateScreenshotQueue(screenshotPathsPool);
         emit sendWidgetsDisabled(QStringList() << "pushButton_clearQueue" << "pushButton_copyScreenshots", false);
     }
