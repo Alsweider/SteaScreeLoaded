@@ -1,5 +1,9 @@
 # SteaScreeLoaded Changelog
 
+## 1.12.0
+- Selection of the source (API) from which the game names shall be downloaded.
+- Button for removing the Steam API key from the settings.
+
 ## 1.11.0
 Quick fix for the games list: It is now possible to add your own [Steam API key](https://steamcommunity.com/dev/apikey).
 Background: Steam has closed open access to [API v2](https://api.steampowered.com/IStoreService/GetAppList/v2/) without prior notice. As a result, game names can no longer be fetched from the original source. This may happen from time to time. With a personal API key, however, it is possible to load many of the missing names from the older [API v1](https://api.steampowered.com/IStoreService/GetAppList/v1/).
