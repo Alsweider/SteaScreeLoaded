@@ -25,9 +25,6 @@
   <property name="windowTitle">
    <string>SteaScreeLoaded</string>
   </property>
-  <property name="toolTip">
-   <string>Your Steam API key might be required to download names for your games.</string>
-  </property>
   <property name="statusTip">
    <string/>
   </property>
@@ -430,7 +427,7 @@
               </sizepolicy>
              </property>
              <property name="toolTip">
-              <UInt>0</UInt>
+              <string>Select a source to fill the Game ID list with names.</string>
              </property>
              <item>
               <property name="text">
@@ -474,7 +471,7 @@
                 <string>Your Steam API key might be required to download names for your games.</string>
                </property>
                <property name="placeholderText">
-                <string>(optional) Steam API key... </string>
+                <string>Steam API key... </string>
                </property>
               </widget>
              </item>

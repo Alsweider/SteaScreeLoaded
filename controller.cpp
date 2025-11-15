@@ -295,17 +295,23 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
 
             emit sendIndexOfComboBox("comboBox_userID", userID);
 
-            emit sendToComboBox("comboBox_gameID", QStringList() << "loading...");
 
             emit sendStatusLabelText("ready", "");
             emit sendLabelsVisible(QStringList() << "label_status", true);
+
+            //Spiel-IDs schon mal einfüllen
+            fillGameIDs(userID);
 
             // Abbruch, wenn kein API-Key gespeichert ist, aber die gewählte API einen verlangt
             if (apiIndex == 1 && apiKey.isEmpty()) {
               //  emit sendStatusLabelText("error", "API Key missing for API 1");
                 emit sendStatusLabelText("API Key missing for Old Steam API (V1)", warningColor);
+                emit sendToComboBox("comboBox_gameID", QStringList() << "Add your API key below / choose different source");
+
                 return;
             }
+
+            emit sendToComboBox("comboBox_gameID", QStringList() << "loading...");
 
             QNetworkAccessManager *nam = new QNetworkAccessManager(this);
 
@@ -400,7 +406,7 @@ QString Controller::getPersonalNameByUserID(QString userID)
 //GetAppList/v1
 void Controller::getGameNamesV1(QNetworkReply *reply)
 {
-    if (games.isEmpty()) {
+    //     if (games.isEmpty()) {
 
         if (reply->error() == QNetworkReply::NoError) {
 
@@ -416,7 +422,7 @@ void Controller::getGameNamesV1(QNetworkReply *reply)
                 games[appID] = name;
             }
         }
-    }
+ //   }
 
     fillGameIDs(userID);
 }
@@ -426,7 +432,7 @@ void Controller::getGameNamesV1(QNetworkReply *reply)
 //GetAppList/v2
 void Controller::getGameNamesV2(QNetworkReply *reply)
 {
-    if ( games.isEmpty() ) {
+  //  if ( games.isEmpty() ) {
 
         if ( reply->error() == QNetworkReply::NoError ) {
 
@@ -442,7 +448,7 @@ void Controller::getGameNamesV2(QNetworkReply *reply)
             }
 
         }
-    }
+ //   }
 
     fillGameIDs(userID);
 }
@@ -462,6 +468,14 @@ void Controller::fillGameIDs(QString userIDCombined)
             gameIDs << gameID + " <" + games[gameID] + ">";
         else
             gameIDs << gameID;
+    }
+
+    if (games.isEmpty()) {
+        // keine Namen vorhanden
+        // => IDs ohne Namen eintragen
+        emit sendComboBoxesCleared(QStringList() << "comboBox_gameID");
+        emit sendToComboBox("comboBox_gameID", gameIDs); // ID-only
+        return;
     }
 
     emit sendComboBoxesCleared(QStringList() << "comboBox_gameID");
