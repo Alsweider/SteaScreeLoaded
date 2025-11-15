@@ -159,6 +159,9 @@ int main(int argc, char *argv[])
     QObject::connect(c, &Controller::sendIndexOfComboBox,
                      &w, &MainWindow::setIndexOfComboBox);
 
+    QObject::connect(c, &Controller::sendIndexOfComboBoxAPI,
+                     &w, &MainWindow::setIndexOfComboBoxAPI);
+
     QObject::connect(c, &Controller::sendLabelsOnMissingStuff,
                      &w, &MainWindow::setLabelsOnMissingStuff);
 
@@ -197,6 +200,13 @@ int main(int argc, char *argv[])
 
     QObject::connect(c, &Controller::sendPreviewCount,
             &w, &MainWindow::showPreviewCount);
+
+    QObject::connect(c, &Controller::sendApiKeyState,
+                     &w, &MainWindow::receiveApiKeyState);
+
+    QObject::connect(&w, &MainWindow::apiIndexChanged,
+                     c, &Controller::setApiIndex);
+
 
 
 

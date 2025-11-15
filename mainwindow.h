@@ -68,12 +68,14 @@ signals:
     void clearCopyingStatusLabels();
     void writeVDF();
     void getVDFStatus();
-    void sendSettings(QSize size, QPoint pos, QString userID, QString userIDComboBox, quint32 jpegQuality);
+    void sendSettings(QSize size, QPoint pos, QString userID, QString userIDComboBox, quint32 jpegQuality, int apiIndex);
     void sendScreenshotsSelected(QStringList screenshotsSelected);
     void sendNeverOfferUpdate();
     void sendNewlySelectedUserID(QString userID);
     void sendTreeWidgetPointer(QTreeWidgetDragAndDrop *treeWidget);
     void sendNewlySelectedGameID(QString gameID);
+    void apiIndexChanged(int index);
+
 
 
 
@@ -93,6 +95,7 @@ public slots:
     void setProgressBarValue(quint32 value);
     void deleteCopiedWidgetItem(QString path);
     void setIndexOfComboBox(QString name, QString text);
+    void setIndexOfComboBoxAPI(QString name, int index);
     void setLabelsText(QStringList list, QString text);
     void setLabelsVisible(QStringList list, bool visible);
     void setStatusLabelText(QString text, QString color);
@@ -103,6 +106,8 @@ public slots:
     void onGameSelected(QString gameID);
     void openFolderInExplorer(const QString &path);
     void showPreviewCount(int currentIndex, int totalCount);
+    void receiveApiKeyState(bool exists);
+
 
 
 private slots:
@@ -119,6 +124,8 @@ private slots:
     void on_pushButtonLeft_clicked();
     void on_pushButtonRight_clicked();
     void on_pushButtonApiKey_clicked();
+    void on_comboBox_chooseAPI_currentIndexChanged(int index);
+    void on_pushButtonClearKey_clicked();
 };
 
 #endif // MAINWINDOW_H

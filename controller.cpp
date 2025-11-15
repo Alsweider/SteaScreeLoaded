@@ -92,19 +92,37 @@ void Controller::readSettings()
 
     settings->beginGroup("LastSelection");
     steamDir = settings->value("SteamDir", defaultSteamDir).toString();
+
     if (QDir(steamDir).exists())
         emit sendLabelsText(QStringList() << "label_steamDirValue", convertSlashes(steamDir));
     else
         emit sendLabelsText(QStringList() << "label_steamDirValue", "Not found, please locate manually");
+
     lastSelectedScreenshotDir = settings->value("Screenshots", QDir::currentPath()).toString();
     lastSelectedUserID = settings->value("UserID").toString();
     lastSelectedGameID = settings->value("GameID").toString();
     apiKey = settings->value("ApiKey").toString();
+   // int apiIndex = settings->value("ChosenAPIIndex", 0).toInt();
+    // Prüfen, ob ein API-Index bereits gespeichert ist
+    QVariant savedIndex = settings->value("ChosenAPIIndex");
+    int apiIndex;
+    if (savedIndex.isValid()) {
+        apiIndex = savedIndex.toInt(); // bisherige Auswahl laden
+    } else {
+        apiIndex = 1; // zweiter Eintrag beim ersten Start, also die API V1, die einen Key erfordert, aber funktioniert
+    }
     quint32 jpegQuality = settings->value("JPEGQuality").toInt();
     if (jpegQuality < 1 || jpegQuality > 100)
         jpegQuality = defaultJpegQuality;
     emit sendJpegQualityValue(jpegQuality);
     settings->endGroup();
+
+    //letzte Position der comboBoxAPI laden
+    emit sendIndexOfComboBoxAPI("comboBox_chooseAPI", apiIndex);
+
+    //Wenn API-Key vorhanden ist, true
+    bool keyExists = !apiKey.isEmpty();
+    emit sendApiKeyState(keyExists);
 
     settings->beginGroup("Screenshots");
     screenshotPathsPool = settings->value("Queue").toStringList();
@@ -117,7 +135,7 @@ void Controller::readSettings()
 }
 
 
-void Controller::writeSettings(QSize size, QPoint pos, QString userID, QString gameID, quint32 jpegQuality)
+void Controller::writeSettings(QSize size, QPoint pos, QString userID, QString gameID, quint32 jpegQuality, int apiIndex)
 {
     settings->beginGroup("WindowGeometry");
     settings->setValue("Size", size);
@@ -133,6 +151,7 @@ void Controller::writeSettings(QSize size, QPoint pos, QString userID, QString g
         settings->setValue("GameID", gameID);
     settings->setValue("JPEGQuality", jpegQuality);
     settings->setValue("ApiKey", apiKey);
+    settings->setValue("ChosenAPIIndex", apiIndex);
     settings->endGroup();
 
     settings->beginGroup("Screenshots");
@@ -281,11 +300,17 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
             emit sendStatusLabelText("ready", "");
             emit sendLabelsVisible(QStringList() << "label_status", true);
 
+            // Abbruch, wenn kein API-Key gespeichert ist, aber die gewählte API einen verlangt
+            if (apiIndex == 1 && apiKey.isEmpty()) {
+              //  emit sendStatusLabelText("error", "API Key missing for API 1");
+                emit sendStatusLabelText("API Key missing for Old Steam API (V1)", warningColor);
+                return;
+            }
+
             QNetworkAccessManager *nam = new QNetworkAccessManager(this);
 
-                if (!apiKey.isEmpty()) {
-                    // Mit API-Key: V1-Endpoint
-                    qDebug() << "API-Key gefunden: " << apiKey << " Verwende GetAppList/v1.";
+            if (apiIndex == 1) {
+                qDebug() << "Alte API V1 gewählt, API-Key: " << apiKey;
 
                     // http://api.steampowered.com/<interface name>/<method name>/v<version>/?key=<api key>&format=<format>
                     QUrl url("https://api.steampowered.com/IStoreService/GetAppList/v1/");
@@ -301,18 +326,13 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
                     nam->get(QNetworkRequest(url));
                 } else {
                     // Ohne API-Key: V2-Endpoint
-                    qDebug() << "Kein API-Key gefunden, verwende GetAppList/v2";
+                    qDebug() << "Neue API V2 gewählt (V2, kein Key nötig, aber evtl. inaktiv)";
+
                     QUrl url("https://api.steampowered.com/ISteamApps/GetAppList/v2");
                     QObject::connect(nam, &QNetworkAccessManager::finished,
                                      this, &Controller::getGameNamesV2);
                     nam->get(QNetworkRequest(url));
                 }
-
-            // QObject::connect(nam, &QNetworkAccessManager::finished,
-            //                  this, &Controller::getGameNames);
-
-            //nam->get(QNetworkRequest(QUrl("https://api.steampowered.com/ISteamApps/GetAppList/v2")));
-
 
         } else {
             emit sendLabelsOnMissingStuff(false, vdfFilename);
@@ -453,6 +473,9 @@ void Controller::fillGameIDs(QString userIDCombined)
         emit sendIndexOfComboBox("comboBox_gameID", lastSelectedGameID);
 
     emit sendWidgetsDisabled(QStringList() << "pushButton_addScreenshots", false);
+
+    emit sendStatusLabelText("ready", "");
+    emit sendLabelsVisible(QStringList() << "label_status", true);
 }
 
 
@@ -1195,3 +1218,24 @@ void Controller::setApiKey(QString key){
         settings->endGroup();
     }
 }
+
+
+void Controller::setApiIndex(int index)
+{
+    apiIndex = index;
+}
+
+
+void Controller::clearApiKey()
+{
+    apiKey.clear();
+    settings->beginGroup("LastSelection");
+    settings->remove("ApiKey");
+    settings->endGroup();
+
+    emit sendApiKeyState(false); // Benachrichtigt das UI, dass kein Key mehr vorhanden ist
+    emit sendStatusLabelText("API Key deleted", "green");
+}
+
+
+

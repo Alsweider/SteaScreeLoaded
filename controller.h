@@ -78,6 +78,7 @@ private:
     QStringList m_screenshotFiles;
     int m_currentScreenshotIndex = 0;
     QString apiKey;
+    int apiIndex;
 
 
 
@@ -109,6 +110,7 @@ signals:
     void deleteCopiedWidgetItem(QString path);
     void sendToComboBox(QString name, QStringList items);
     void sendIndexOfComboBox(QString name, QString text);
+    void sendIndexOfComboBoxAPI(QString name, int index);
     void sendLabelsText(QStringList list, QString text);
     void sendScreenshotList(QList<Screenshot> screenshotList, QPoint center, QStringList steamLimits);
     void sendStatusLabelText(QString text, QString color);
@@ -118,12 +120,13 @@ signals:
     void sendJpegQualityValue(quint32 jpegQualityValue);
     void openPathInExplorer(const QString &path);
     void sendPreviewImage(QPixmap pixmap);
-    void sendPreviewCount(int currentIndex, int totalCount);
+    void sendPreviewCount(int currentIndex, int totalCount);    
+    void sendApiKeyState(bool keyExists);
 
 
 public slots:
     void getButtonList(QList<QPushButton *> buttonList);
-    void writeSettings(QSize size, QPoint pos, QString userID, QString gameID, quint32 jpegQuality);
+    void writeSettings(QSize size, QPoint pos, QString userID, QString gameID, quint32 jpegQuality, int apiIndex);
     void removeEntryFromScreenshotPathsPool(QString entry);
     void returnLastSelectedScreenshotDir();
     void clearScreenshotPathsPool();
@@ -144,8 +147,8 @@ public slots:
     void showNextScreenshot();
     void showPreviousScreenshot();
     void setApiKey(QString key);
-
-
+    void setApiIndex(int index);
+    void clearApiKey();
 
 
 private slots:

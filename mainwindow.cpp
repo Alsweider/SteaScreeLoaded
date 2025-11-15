@@ -272,11 +272,16 @@ void MainWindow::insertIntoComboBox(QString name, QStringList items)
     checkModifiedGameList(ui->comboBox_gameID->currentText());
 }
 
-
 void MainWindow::setIndexOfComboBox(QString name, QString text)
 {
     QComboBox *comboBox = this->findChild<QComboBox*>(name);
     comboBox->setCurrentIndex(comboBox->findText(text, Qt::MatchStartsWith));
+}
+
+void MainWindow::setIndexOfComboBoxAPI(QString name, int index)
+{
+    QComboBox *comboBox = this->findChild<QComboBox*>(name);
+    comboBox->setCurrentIndex(index);
 }
 
 
@@ -322,7 +327,7 @@ void MainWindow::disableAllControls()
 void MainWindow::setStatusLabelText(QString text, QString color)
 {
     ui->label_status->setText(text);
-    if ( color.isEmpty() )
+    if (color.isEmpty())
         color = "black";
     ui->label_status->setStyleSheet("QLabel {color: " + color + "};");
 }
@@ -446,11 +451,16 @@ void MainWindow::on_pushButton_prepare_clicked()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    emit sendSettings(size(), pos(),
-                      ui->comboBox_userID->currentText().remove(QRegularExpression(" <.+>$")),
-                      ui->comboBox_gameID->currentText().remove(QRegularExpression(" <.+>$")),
-                      ui->spinBox_jpegQuality->value());
+    emit sendSettings(
+        size(),
+        pos(),
+      ui->comboBox_userID->currentText().remove(QRegularExpression(" <.+>$")),
+      ui->comboBox_gameID->currentText().remove(QRegularExpression(" <.+>$")),
+      ui->spinBox_jpegQuality->value(),
+       ui->comboBox_chooseAPI->currentIndex()
+        );
     event->accept();
+
 }
 
 void MainWindow::setController(Controller *ctrl)
@@ -727,5 +737,38 @@ void MainWindow::on_pushButtonApiKey_clicked()
 
     ui->lineEditApiKey->clear();
     ui->lineEditApiKey->setPlaceholderText("Key set, please restart.");
+}
+
+
+void MainWindow::on_comboBox_chooseAPI_currentIndexChanged(int index)
+{
+    emit apiIndexChanged(index);
+
+    if (ui->comboBox_chooseAPI->currentIndex() == 1){
+        ui->lineEditApiKey->setEnabled(true);
+    } else {
+        ui->lineEditApiKey->setEnabled(false);
+    }
+
+    setStatusLabelText("Games source changed, please restart the programme.", warningColor);
+}
+
+void MainWindow::receiveApiKeyState(bool exists)
+{
+    if (exists) {
+        ui->lineEditApiKey->setEchoMode(QLineEdit::Password);
+        ui->lineEditApiKey->clear();
+        ui->lineEditApiKey->setPlaceholderText("Key loaded");
+    } else {
+        ui->lineEditApiKey->setEchoMode(QLineEdit::Normal);
+        ui->lineEditApiKey->clear();
+        ui->lineEditApiKey->setPlaceholderText("Enter Steam API key...");
+    }
+}
+
+void MainWindow::on_pushButtonClearKey_clicked()
+{
+    if(controller)
+    controller->clearApiKey();
 }
 
