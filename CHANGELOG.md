@@ -1,5 +1,8 @@
 # SteaScreeLoaded Changelog
 
+## 1.12.1
+Bug fix: Endless "loading..." in the game ID list and no IDs on first launch.
+
 ## 1.12.0
 - Selection of the source (API) from which the game names shall be downloaded.
 - Button for removing the Steam API key from the settings.
