@@ -753,6 +753,7 @@ void MainWindow::on_pushButtonApiKey_clicked()
 
 void MainWindow::on_comboBox_chooseAPI_currentIndexChanged(int index)
 {
+    qDebug() << "comboBox_chooseAPI Index gewählt: " << index;
     emit apiIndexChanged(index);
 
     if (ui->comboBox_chooseAPI->currentIndex() == 1){

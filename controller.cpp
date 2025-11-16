@@ -105,12 +105,14 @@ void Controller::readSettings()
    // int apiIndex = settings->value("ChosenAPIIndex", 0).toInt();
     // Prüfen, ob ein API-Index bereits gespeichert ist
     QVariant savedIndex = settings->value("ChosenAPIIndex");
-    int apiIndex;
+    //int apiIndexTemp;
     if (savedIndex.isValid()) {
         apiIndex = savedIndex.toInt(); // bisherige Auswahl laden
     } else {
         apiIndex = 1; // zweiter Eintrag beim ersten Start, also die API V1, die einen Key erfordert, aber funktioniert
     }
+
+    qDebug() << "Einstellung API comboBox Index geladen: " << apiIndex;
     quint32 jpegQuality = settings->value("JPEGQuality").toInt();
     if (jpegQuality < 1 || jpegQuality > 100)
         jpegQuality = defaultJpegQuality;
@@ -306,7 +308,7 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
             if (apiIndex == 1 && apiKey.isEmpty()) {
               //  emit sendStatusLabelText("error", "API Key missing for API 1");
                 emit sendStatusLabelText("API Key missing for Old Steam API (V1)", warningColor);
-                emit sendToComboBox("comboBox_gameID", QStringList() << "Add your API key below / choose different source");
+                emit sendToComboBox("comboBox_gameID", QStringList() << "Add API key below / choose different source");
 
                 return;
             }
