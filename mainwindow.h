@@ -126,6 +126,7 @@ private slots:
     void on_pushButtonApiKey_clicked();
     void on_comboBox_chooseAPI_currentIndexChanged(int index);
     void on_pushButtonClearKey_clicked();
+    void on_pushButtonResetName_clicked();
 };
 
 #endif // MAINWINDOW_H

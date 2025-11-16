@@ -100,13 +100,31 @@ void MainWindow::showPreviewImage(QPixmap pixmap)
     m_previewOriginal = pixmap;
 
     QPixmap scaled = pixmap.scaled(
-                               ui->pushButtonPreview->size(),
-                               Qt::KeepAspectRatio,
-        Qt::SmoothTransformation);
+        ui->pushButtonPreview->size(),
+        Qt::KeepAspectRatio,
+        Qt::SmoothTransformation
+        );
 
     ui->pushButtonPreview->setIcon(QIcon(scaled));
     ui->pushButtonPreview->setIconSize(scaled.size());
     ui->pushButtonPreview->setText(""); //Text entfernen
+
+    // 2. Durchlauf, damit die Skalierung des Bildes sofort passt
+    QTimer::singleShot(0, this, [this](){
+ if (m_previewOriginal.isNull())
+            return;
+
+        QSize finalSize = ui->pushButtonPreview->size();
+
+        QPixmap scaledFinal = m_previewOriginal.scaled(
+            finalSize,
+            Qt::KeepAspectRatio,
+            Qt::SmoothTransformation
+            );
+        ui->pushButtonPreview->setIcon(QIcon(scaledFinal));
+        ui->pushButtonPreview->setIconSize(scaledFinal.size());
+    });
+
 }
 
 
@@ -770,5 +788,54 @@ void MainWindow::on_pushButtonClearKey_clicked()
 {
     if(controller)
     controller->clearApiKey();
+}
+
+
+void MainWindow::on_pushButtonResetName_clicked()
+{
+    QString id = ui->lineEditGameID->text().trimmed();
+    if (id.isEmpty())
+        return;
+
+    // Map laden
+    QMap<QString, QString> map = loadNameMap();
+
+    // ID entfernen
+    if (map.contains(id))
+        map.remove(id);
+
+    // Map wieder in ids.txt schreiben
+    QFile file("ids.txt");
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
+        return;
+
+    QTextStream out(&file);
+    for (auto it = map.begin(); it != map.end(); ++it)
+        out << it.key() << "=" << it.value() << "\n";
+
+    file.close();
+
+    // ComboBox-Eintrag zurücksetzen
+    int idx = ui->comboBox_gameID->currentIndex();
+    ui->comboBox_gameID->setItemText(idx, id);
+
+    // LineEdit zurücksetzen
+    ui->lineEditGameName->clear();
+
+    // Nachricht für den Benutzer
+    QMessageBox msgBox(this);
+    msgBox.setWindowTitle("Name Reset");
+    msgBox.setText("ID has been removed from ids.txt");
+
+    msgBox.addButton(QMessageBox::Ok);
+    QPushButton *openButton = msgBox.addButton("Open .txt", QMessageBox::ActionRole);
+
+    msgBox.exec();
+
+    if (msgBox.clickedButton() == openButton) {
+        QFileInfo fi("ids.txt");
+        if (fi.exists())
+            QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
+    }
 }
 

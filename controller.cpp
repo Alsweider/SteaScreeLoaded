@@ -327,18 +327,51 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
                     query.addQueryItem("last_appid", "0");
                     url.setQuery(query);
 
-                    QObject::connect(nam, &QNetworkAccessManager::finished,
-                                     this, &Controller::getGameNamesV1);
-                    nam->get(QNetworkRequest(url));
-                } else {
+                    // Um Verbindungsfehler auszulesen
+                    QNetworkReply *reply = nam->get(QNetworkRequest(url));
+
+                    QObject::connect(reply, &QNetworkReply::finished, this, [=]() {
+                        getGameNamesV1(reply);
+                    });
+
+                    // Verbindungsfehler lesen
+                    QObject::connect(reply, &QNetworkReply::errorOccurred, this,
+                                     [=](QNetworkReply::NetworkError code){
+                                         qDebug() << "Fehler:" << code << reply->errorString();
+                                     });
+
+
+                    // QObject::connect(nam, &QNetworkAccessManager::finished,
+                    //                  this, &Controller::getGameNamesV1);
+
+                    // nam->get(QNetworkRequest(url));
+            } else if (apiIndex == 0){
                     // Ohne API-Key: V2-Endpoint
                     qDebug() << "Neue API V2 gewählt (V2, kein Key nötig, aber evtl. inaktiv)";
+                    QUrl url("https://api.steampowered.com/ISteamApps/GetAppList/v2"); // Adresse der aktuell inaktiven API V2
 
-                    QUrl url("https://api.steampowered.com/ISteamApps/GetAppList/v2");
-                    QObject::connect(nam, &QNetworkAccessManager::finished,
-                                     this, &Controller::getGameNamesV2);
-                    nam->get(QNetworkRequest(url));
-                }
+                    // Um Verbindungsfehler auszulesen
+                    QNetworkReply *reply = nam->get(QNetworkRequest(url));
+
+                    QObject::connect(reply, &QNetworkReply::finished, this, [=]() {
+                        getGameNamesV2(reply);
+                    });
+
+                    // Verbindungsfehler lesen
+                    QObject::connect(reply, &QNetworkReply::errorOccurred, this,
+                                     [=](QNetworkReply::NetworkError code){
+                                         qDebug() << "Fehler:" << code << reply->errorString();
+                                     });
+
+
+                    // QObject::connect(nam, &QNetworkAccessManager::finished,
+                    //                  this, &Controller::getGameNamesV2);
+
+                    // nam->get(QNetworkRequest(url));
+            } else if (apiIndex == 2){ //Keine externen API-Anfragen
+                qDebug() << "Index " << apiIndex << ". Keine API-Anfragen, nur lokale IDs nutzen";
+                fillGameIDs(userID);
+            }
 
         } else {
             emit sendLabelsOnMissingStuff(false, vdfFilename);
