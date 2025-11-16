@@ -121,12 +121,12 @@ private slots:
     void on_splitter_splitterMoved(int pos, int index);
     void on_comboBox_gameID_currentTextChanged(const QString &arg1);
     void on_pushButtonSaveName_clicked();
-    void on_pushButtonLeft_clicked();
-    void on_pushButtonRight_clicked();
     void on_pushButtonApiKey_clicked();
     void on_comboBox_chooseAPI_currentIndexChanged(int index);
     void on_pushButtonClearKey_clicked();
     void on_pushButtonResetName_clicked();
+    void on_horizontalSliderScreenshots_valueChanged(int value);
+    void on_horizontalScrollBarScreenshots_valueChanged(int value);
 };
 
 #endif // MAINWINDOW_H

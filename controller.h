@@ -144,11 +144,12 @@ public slots:
     void receiveTreeWidgetPointer(QTreeWidgetDragAndDrop *receivedWidget);
     void loadFirstScreenshotForGame(QString gameID);
     void onUserIDSelected(const QString &userID);
-    void showNextScreenshot();
-    void showPreviousScreenshot();
+    // void showNextScreenshot();
+    // void showPreviousScreenshot();
     void setApiKey(QString key);
     void setApiIndex(int index);
     void clearApiKey();
+    void setScreenshotIndex(int index);
 
 
 private slots:

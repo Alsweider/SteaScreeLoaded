@@ -79,6 +79,13 @@ void MainWindow::bootStrap()
     connect(ui->comboBox_userID, &QComboBox::currentTextChanged,
             controller, &Controller::onUserIDSelected);
 
+    connect(controller, &Controller::sendPreviewCount,
+            this, [this](int current, int total){
+                ui->horizontalScrollBarScreenshots->setMaximum(total - 1);
+                ui->horizontalScrollBarScreenshots->setValue(current - 1);
+            });
+
+
     // Autovervollständigung für Spielnamen aktivieren
     QCompleter *completer = new QCompleter(ui->comboBox_gameID->model(), this);
     completer->setCaseSensitivity(Qt::CaseInsensitive);    // Groß-/Kleinschreibung ignorieren
@@ -723,20 +730,6 @@ void MainWindow::updateComboBoxNames()
 }
 
 
-void MainWindow::on_pushButtonLeft_clicked()
-{
-    if (controller)
-        controller->showPreviousScreenshot();
-}
-
-
-void MainWindow::on_pushButtonRight_clicked()
-{
-    if (controller)
-        controller->showNextScreenshot();
-}
-
-
 void MainWindow::showPreviewCount(int currentIndex, int totalCount)
 {
     if (totalCount <= 0)
@@ -837,5 +830,19 @@ void MainWindow::on_pushButtonResetName_clicked()
         if (fi.exists())
             QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
     }
+}
+
+
+void MainWindow::on_horizontalSliderScreenshots_valueChanged(int value)
+{
+    if (controller)
+        controller->setScreenshotIndex(value);
+}
+
+
+void MainWindow::on_horizontalScrollBarScreenshots_valueChanged(int value)
+{
+    if (controller)
+        controller->setScreenshotIndex(value);
 }
 

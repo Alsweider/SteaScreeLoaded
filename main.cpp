@@ -209,7 +209,6 @@ int main(int argc, char *argv[])
 
 
 
-
     w.bootStrap();
     c->bootStrap();
     w.show();

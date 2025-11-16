@@ -368,7 +368,7 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
                     //                  this, &Controller::getGameNamesV2);
 
                     // nam->get(QNetworkRequest(url));
-            } else if (apiIndex == 2){ //Keine externen API-Anfragen
+            } else { //Keine externen API-Anfragen //  (apiIndex == 2)
                 qDebug() << "Index " << apiIndex << ". Keine API-Anfragen, nur lokale IDs nutzen";
                 fillGameIDs(userID);
             }
@@ -934,12 +934,32 @@ void Controller::resizeAndSaveLargeScreenshot(Screenshot screenshot)
 
 void Controller::saveThumbnail(QString filename, QImage image, quint32 width, quint32 height)
 {
-    quint32 tnWidth = 200;
-    quint32 tnHeight = (tnWidth * height) / width;
+    // Teilen durch Null verhindern.
+    if (width == 0 || height == 0) {
+        qWarning() << "saveThumbnail: invalid image size for" << filename;
+        return; // Methode wird verlassen. Kein Thumbnail erstellt. Steam muss ein eigenes erzeugen.
+    }
 
-    image.scaled(QSize(tnWidth, tnHeight), Qt::IgnoreAspectRatio, Qt::SmoothTransformation)
-            .save(copyDest + "/thumbnails/" + filename, "jpg", 95);
+    QImage thumb;
+    const quint32 maxEdge = 200; // Maximale Kantenlänge 200 Pixel
+
+    if (width >= height) {
+        thumb = image.scaledToWidth(maxEdge, Qt::SmoothTransformation);
+    } else {
+        thumb = image.scaledToHeight(maxEdge, Qt::SmoothTransformation);
+    }
+
+    thumb.save(copyDest + "/thumbnails/" + filename, "jpg", 95);
 }
+
+// void Controller::saveThumbnail(QString filename, QImage image, quint32 width, quint32 height)
+// {
+//     quint32 tnWidth = 200;
+//     quint32 tnHeight = (tnWidth * height) / width;
+
+//     image.scaled(QSize(tnWidth, tnHeight), Qt::IgnoreAspectRatio, Qt::SmoothTransformation)
+//         .save(copyDest + "/thumbnails/" + filename, "jpg", 95);
+// }
 
 
 QString Controller::getEncodingProcessOfJpeg(QFile *file)    // implemented to mitigate the issue #9: https://github.com/Foyl/SteaScree/issues/9
@@ -1226,35 +1246,35 @@ QString Controller::getLastSelectedScreenshotPath() const
 }
 
 
-void Controller::showNextScreenshot()
-{
-    if (lastSelectedScreenshotPath.isEmpty() || m_screenshotFiles.isEmpty())
-        return;
+// void Controller::showNextScreenshot()
+// {
+//     if (lastSelectedScreenshotPath.isEmpty() || m_screenshotFiles.isEmpty())
+//         return;
 
-    if (m_currentScreenshotIndex + 1 < m_screenshotFiles.size())
-        m_currentScreenshotIndex++;
-    else
-        m_currentScreenshotIndex = 0; // wieder von vorn beginnen
+//     if (m_currentScreenshotIndex + 1 < m_screenshotFiles.size())
+//         m_currentScreenshotIndex++;
+//     else
+//         m_currentScreenshotIndex = 0; // wieder von vorn beginnen
 
-    QString nextImagePath = QDir(lastSelectedScreenshotPath).absoluteFilePath(m_screenshotFiles[m_currentScreenshotIndex]);
-    emit sendPreviewImage(QPixmap(nextImagePath));
-    emit sendPreviewCount(m_currentScreenshotIndex + 1, m_screenshotFiles.size());
-}
+//     QString nextImagePath = QDir(lastSelectedScreenshotPath).absoluteFilePath(m_screenshotFiles[m_currentScreenshotIndex]);
+//     emit sendPreviewImage(QPixmap(nextImagePath));
+//     emit sendPreviewCount(m_currentScreenshotIndex + 1, m_screenshotFiles.size());
+// }
 
-void Controller::showPreviousScreenshot()
-{
-    if (lastSelectedScreenshotPath.isEmpty() || m_screenshotFiles.isEmpty())
-        return;
+// void Controller::showPreviousScreenshot()
+// {
+//     if (lastSelectedScreenshotPath.isEmpty() || m_screenshotFiles.isEmpty())
+//         return;
 
-    if (m_currentScreenshotIndex - 1 >= 0)
-        m_currentScreenshotIndex--;
-    else
-        m_currentScreenshotIndex = m_screenshotFiles.size() - 1; // zum letzten Bild springen
+//     if (m_currentScreenshotIndex - 1 >= 0)
+//         m_currentScreenshotIndex--;
+//     else
+//         m_currentScreenshotIndex = m_screenshotFiles.size() - 1; // zum letzten Bild springen
 
-    QString prevImagePath = QDir(lastSelectedScreenshotPath).absoluteFilePath(m_screenshotFiles[m_currentScreenshotIndex]);
-    emit sendPreviewImage(QPixmap(prevImagePath));
-    emit sendPreviewCount(m_currentScreenshotIndex + 1, m_screenshotFiles.size());
-}
+//     QString prevImagePath = QDir(lastSelectedScreenshotPath).absoluteFilePath(m_screenshotFiles[m_currentScreenshotIndex]);
+//     emit sendPreviewImage(QPixmap(prevImagePath));
+//     emit sendPreviewCount(m_currentScreenshotIndex + 1, m_screenshotFiles.size());
+// }
 
 void Controller::setApiKey(QString key){
     apiKey = key;
@@ -1283,6 +1303,25 @@ void Controller::clearApiKey()
     emit sendApiKeyState(false); // Benachrichtigt das UI, dass kein Key mehr vorhanden ist
     emit sendStatusLabelText("API Key deleted", "green");
 }
+
+
+void Controller::setScreenshotIndex(int index)
+{
+    if (lastSelectedScreenshotPath.isEmpty() || m_screenshotFiles.isEmpty())
+        return;
+
+    if (index < 0 || index >= m_screenshotFiles.size())
+        return;
+
+    m_currentScreenshotIndex = index;
+
+    QString imgPath = QDir(lastSelectedScreenshotPath)
+                          .absoluteFilePath(m_screenshotFiles[index]);
+
+    emit sendPreviewImage(QPixmap(imgPath));
+    emit sendPreviewCount(index + 1, m_screenshotFiles.size());
+}
+
 
 
 
