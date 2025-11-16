@@ -1,5 +1,10 @@
 # SteaScreeLoaded Changelog
 
+## 1.13.0
+- Added a "None" option to skip all external API calls in "Game source" for those who wish to work only locally with IDs.
+- Added a button to reset a custom naming, which deletes the chosen name mapping from ids.txt.
+- Fixed a scaling issue of the preview screenshot after startup.
+
 ## 1.12.1
 Bug fix: Endless "loading..." in the game ID list and no IDs on first launch.
 
