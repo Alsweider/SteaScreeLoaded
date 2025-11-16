@@ -1,5 +1,10 @@
 # SteaScreeLoaded Changelog
 
+## 1.14.0
+- To spare the clicking finger, the buttons for jumping to the next/previous preview image were replaced with a scroll bar.
+- Potential division-by-zero errors in thumbnail generation have been handled.
+- Thumbnail sizes have been set to a maximum edge length of 200 pixels. Previously, only the width was limited, allowing portrait thumbnails to exceed the 200-pixel standard. Even though Steam currently accepts oversized thumbnails, we stick to the standard to ensure they cannot exceed the 200x200 frame.
+
 ## 1.13.0
 - Added a "None" option to skip all external API calls in "Game source" for those who wish to work only locally with IDs.
 - Added a button to reset a custom naming, which deletes the chosen name mapping from ids.txt.
