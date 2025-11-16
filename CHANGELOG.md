@@ -1,4 +1,6 @@
 # SteaScreeLoaded Changelog
+## 1.14.1
+API switching bug fixed: A redeclaration of a global variable (the index of the API selection list) as a local variable within a method had prevented reliable switching between APIs. The index loaded from the settings file appeared to be applied, yet was in fact not used by the programme. Instead, the default index was taken. This created the impression that the open Steam API V2 was functioning once more, although it is presently unreachable.
 
 ## 1.14.0
 - To spare the clicking finger, the buttons for jumping to the next/previous preview image were replaced with a scroll bar.
