@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>res/misc/loader.gif</file>
+        <file>res/misc/moneroQR.png</file>
     </qresource>
 </RCC>

@@ -21,7 +21,8 @@
 #include <QDebug>
 #include <controller.h>
 #include <QCompleter>
-
+#include <QStandardPaths>
+#include <QTextEdit>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -88,6 +89,10 @@ void MainWindow::bootStrap()
     connect(controller, &Controller::apiReachabilityChanged,
             this, &MainWindow::onApiReachabilityChanged);
 
+    connect(controller, &Controller::updateStatusMessage,
+            this, [this](const QString &msg){
+                ui->statusBar->showMessage(msg, 5000);
+            });
 
 
     // Autovervollständigung für Spielnamen aktivieren
@@ -480,17 +485,92 @@ void MainWindow::on_pushButton_prepare_clicked()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    emit sendSettings(
-        size(),
-        pos(),
-      ui->comboBox_userID->currentText().remove(QRegularExpression(" <.+>$")),
-      ui->comboBox_gameID->currentText().remove(QRegularExpression(" <.+>$")),
-      ui->spinBox_jpegQuality->value(),
-       ui->comboBox_chooseAPI->currentIndex()
-        );
-    event->accept();
+    if (controller && controller->resetOnClose) {
 
+        QString path;
+        if (controller->settings)
+            path = controller->settings->fileName();
+        else
+            path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+                   + "/Alsweider/SteaScreeLoaded.ini";
+
+        // Ordner sichern, bevor Datei gelöscht wird
+        QFileInfo info(path);
+        QString dirPath = info.absolutePath();
+
+        delete controller->settings;
+        controller->settings = nullptr;
+
+        bool removed = QFile::remove(path);
+        qDebug() << "Settings-Datei gelöscht?" << removed << path;
+
+        // Ordner prüfen und ggf. löschen
+        QDir dir(dirPath);
+        QStringList entries = dir.entryList(QDir::NoDotAndDotDot | QDir::AllEntries);
+
+        if (entries.isEmpty()) {
+            bool removedDir = dir.rmdir(dirPath);
+            qDebug() << "Einstellungsordner war leer und wurde entfernt:" << removedDir << dirPath;
+        } else {
+            qDebug() << "Einstellungsordner nicht leer, verbleibt bestehen:" << dirPath;
+        }
+
+    } else {
+        emit sendSettings(
+            size(),
+            pos(),
+            ui->comboBox_userID->currentText().remove(QRegularExpression(" <.+>$")),
+            ui->comboBox_gameID->currentText().remove(QRegularExpression(" <.+>$")),
+            ui->spinBox_jpegQuality->value(),
+            ui->comboBox_chooseAPI->currentIndex()
+            );
+    }
+
+    event->accept();
 }
+
+// void MainWindow::closeEvent(QCloseEvent *event)
+// {
+//     if(controller && controller->resetOnClose) {
+//         QString path;
+//         if(controller->settings)
+//             path = controller->settings->fileName();  // Pfad sichern, bevor settings gelöscht wird
+//         else
+//             path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+//                    + "/Alsweider/SteaScreeLoaded.ini"; // Fallback
+
+//         delete controller->settings;
+//         controller->settings = nullptr;
+
+//         bool removed = QFile::remove(path);
+//         qDebug() << "Settings-Datei gelöscht?" << removed << path;
+//     } else {
+//         emit sendSettings(
+//             size(),
+//             pos(),
+//             ui->comboBox_userID->currentText().remove(QRegularExpression(" <.+>$")),
+//             ui->comboBox_gameID->currentText().remove(QRegularExpression(" <.+>$")),
+//             ui->spinBox_jpegQuality->value(),
+//             ui->comboBox_chooseAPI->currentIndex()
+//             );
+//     }
+
+//     event->accept();
+// }
+
+// void MainWindow::closeEvent(QCloseEvent *event)
+// {
+//     emit sendSettings(
+//         size(),
+//         pos(),
+//       ui->comboBox_userID->currentText().remove(QRegularExpression(" <.+>$")),
+//       ui->comboBox_gameID->currentText().remove(QRegularExpression(" <.+>$")),
+//       ui->spinBox_jpegQuality->value(),
+//        ui->comboBox_chooseAPI->currentIndex()
+//         );
+//     event->accept();
+
+// }
 
 void MainWindow::setController(Controller *ctrl)
 {
@@ -900,5 +980,160 @@ void MainWindow::onApiReachabilityChanged(bool erreichbar)
         ui->label_apiCheck->setStyleSheet("color: red; font-size: 12;");
         ui->label_apiCheck->setToolTip("Connection failed.");
     }
+}
+
+
+void MainWindow::on_actionReset_settings_triggered()
+{
+
+    if(controller) {
+        controller->resetSettings();
+    }
+    bootStrap();
+
+    ui->statusBar->showMessage("Settings.ini and the user interface have been reset.", 5000);
+}
+
+
+void MainWindow::on_actionOpen_settings_triggered()
+{
+    QString settingsPath = controller->settings->fileName();
+
+    QFileInfo fileInfo(settingsPath);
+    if(fileInfo.exists()) {
+        // Pfad zum Settings-Ordner
+        QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absolutePath()));
+        ui->statusBar->showMessage("Settings folder opened.", 5000);
+    } else {
+        qWarning("Settings.ini wurde nicht gefunden!");
+        ui->statusBar->showMessage("Settings not found!", 5000);
+    }
+}
+
+
+void MainWindow::on_action_Update_triggered()
+{
+    if (controller)
+        controller->checkForUpdates();
+}
+
+
+void MainWindow::on_action_About_triggered()
+{
+    QDialog dialog(this);
+    dialog.setWindowTitle("About SteaScreeLoaded");
+
+    QVBoxLayout *layout = new QVBoxLayout(&dialog);
+
+    // Haupttext
+    QLabel *label = new QLabel(
+        "<h3>SteaScreeLoaded</h3>"
+        "<p>A Steam cloud screenshot upload helper.</p>"
+        "<p>&copy; 2025 <a href=\"https://github.com/Alsweider\">Alsweider</a></p>"
+        "<p>This fork is based on <a href=\"https://github.com/awthwathje/SteaScree\">SteaScree</a> by Foyl and is licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.html.en\">GNU General Public License v3.0 (GPL 3.0)</a>.</p>"
+        "<hr>"
+        "<p>If you enjoy using this software, you are welcome to support the author through:</p>"
+        "<p>Ko-Fi: <a href=\"https://ko-fi.com/alsweider\">https://ko-fi.com/alsweider</a></p>"
+        "<p>Monero (XMR):</p>"
+        );
+    label->setTextFormat(Qt::RichText);
+    label->setAlignment(Qt::AlignHCenter | Qt::AlignTop);  // horizontal zentriert
+    label->setTextInteractionFlags(Qt::TextBrowserInteraction); // Links klickbar
+    layout->addWidget(label);
+
+    // QR-Code
+    QLabel *qrLabel = new QLabel;
+    QPixmap qrPixmap(":/res/misc/moneroQR.png");
+    qrLabel->setPixmap(qrPixmap.scaled(150,150,Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    qrLabel->setAlignment(Qt::AlignHCenter);
+    layout->addWidget(qrLabel);
+
+    // Kopierbares Feld für Monero-Adresse
+    QTextEdit *moneroField = new QTextEdit("88o74DJuHyxNr8rFkbH2xaFKkN35jiUcS12htB13SNPVVrzA4zX4ruJj8AXURrR3ssMni8zeQZHAjV6aFYwNUZy8AwT5c8M");
+    moneroField->setReadOnly(true);
+    // moneroField->setAlignment(Qt::AlignCenter);       // Text zentrieren
+    moneroField->setLineWrapMode(QTextEdit::NoWrap);  // kein automatisches Umbrechen
+    moneroField->setMaximumWidth(400);                // Breite begrenzen
+    moneroField->setFixedHeight(50);                  // Höhe anpassen
+
+    // Wrapper für horizontale Zentrierung
+    QHBoxLayout *hLayout = new QHBoxLayout;
+    hLayout->addStretch();
+    hLayout->addWidget(moneroField);
+    hLayout->addStretch();
+    layout->addLayout(hLayout);
+
+    // Schließen-Button
+    QPushButton *closeBtn = new QPushButton("Close");
+    connect(closeBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
+
+    // Button ebenfalls zentrieren
+    QHBoxLayout *buttonLayout = new QHBoxLayout;
+    buttonLayout->addStretch();
+    buttonLayout->addWidget(closeBtn);
+    buttonLayout->addStretch();
+    layout->addLayout(buttonLayout);
+
+    dialog.exec();
+
+ //    QDialog dialog(this);
+ //    dialog.setWindowTitle("Über SteaScreeLoaded");
+
+ //    QVBoxLayout *layout = new QVBoxLayout(&dialog);
+
+ //    QLabel *label = new QLabel(
+ //        "<h3>SteaScreeLoaded</h3>"
+ //        "<p>A Steam cloud screenshot upload helper.</p>"
+ //        "<p>&copy; 2025 <a href=\"https://github.com/Alsweider\">Alsweider</a></p>"
+ //        "<p>This fork is based on <a href=\"https://github.com/awthwathje/SteaScree\">SteaScree</a> by Foyl and is licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\">GNU General Public License v3.0 (GPL 3.0)</a>.</p>"
+ //        "<hr>"
+ //        "<p><p>If you enjoy using this software, you are welcome to support the author through:</p>"
+ //        "<p><a href=\"https://ko-fi.com/alsweider\">Ko-fi</a></p>"
+ //        "<p>Monero:</p>"
+ //         );
+ //    label->setTextFormat(Qt::RichText);
+ //    label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // horizontal + vertikal
+ //    label->setTextInteractionFlags(Qt::TextBrowserInteraction); // Links klickbar
+ //    layout->addWidget(label);
+
+ //    // Kopierbares Feld für Monero-Adresse
+ //    QTextEdit *moneroField = new QTextEdit("88o74DJuHyxNr8rFkbH2xaFKkN35jiUcS12htB13SNPVVrzA4zX4ruJj8AXURrR3ssMni8zeQZHAjV6aFYwNUZy8AwT5c8M");
+ //    moneroField->setReadOnly(true);
+ // //   moneroField->setFixedHeight(50);
+ //    moneroField->setMaximumWidth(150);
+ //    moneroField->setAlignment(Qt::AlignCenter);
+ //    moneroField->setLineWrapMode(QTextEdit::NoWrap);
+ //    layout->addWidget(moneroField);
+
+
+ //    QPushButton *closeBtn = new QPushButton("Close");
+ //    connect(closeBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
+ //    layout->addWidget(closeBtn);
+
+ //    dialog.exec();
+
+ //    // QMessageBox aboutBox(this);
+ //    // aboutBox.setWindowTitle("About SteaScreeLoaded");
+ //    // aboutBox.setText(
+ //    //     "<h3>SteaScreeLoaded</h3>"
+ //    //     "<p>A Steam cloud screenshot upload helper.</p>"
+ //    //     "<p>&copy; 2025 <a href=\"https://github.com/Alsweider\">Alsweider</a></p>"
+ //    //     "<p>This fork is based on <a href=\"https://github.com/awthwathje/SteaScree\">SteaScree</a> by Foyl and is licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\">GNU General Public License v3.0 (GPL 3.0)</a>.</p>"
+ //    //     "<hr>"
+ //    //     "<p><p>If you enjoy using this software, you are welcome to support the author through:</p>"
+ //    //     "<ul>"
+ //    //     "<li><a href=\"https://ko-fi.com/alsweider\">Ko-fi</a></li>"
+ //    //     "<li>Monero: <code>88o74DJuHyxNr8rFkbH2xaFKkN35jiUcS12htB13SNPVVrzA4zX4ruJj8AXURrR3ssMni8zeQZHAjV6aFYwNUZy8AwT5c8M</code></li>"
+ //    //     "</ul>"
+ //    //     );
+ //    // aboutBox.setIcon(QMessageBox::Information);
+ //    // aboutBox.exec();
+}
+
+
+void MainWindow::on_actionDelete_settings_triggered()
+{
+    controller->resetOnClose = true;
+    ui->statusBar->showMessage("Settings.ini is removed upon closing the programme.", 5000);
 }
 

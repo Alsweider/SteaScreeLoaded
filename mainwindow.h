@@ -130,6 +130,12 @@ private slots:
     void on_pushButtonResetName_clicked();
     void on_horizontalSliderScreenshots_valueChanged(int value);
     void on_horizontalScrollBarScreenshots_valueChanged(int value);
+    void on_actionReset_settings_triggered();
+    void on_actionDelete_settings_triggered();
+    void on_actionOpen_settings_triggered();
+    void on_action_Update_triggered();
+    void on_action_About_triggered();
+
 };
 
 #endif // MAINWINDOW_H

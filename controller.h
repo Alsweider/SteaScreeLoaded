@@ -21,7 +21,10 @@ public:
     explicit Controller(QObject *parent = 0);
     void bootStrap();
     QString getLastSelectedScreenshotPath() const;
-
+    void resetSettings();
+    bool resetOnClose = false;
+    QSettings *settings;
+    void checkForUpdates();
 
 
 private:
@@ -35,7 +38,6 @@ private:
     QString selectedGameID;
     QString userDataDir;
     QString defaultSteamDir;
-    QSettings *settings;
     QString steamDir;
     QStringList vdfPaths;
     QString userID;
@@ -67,7 +69,6 @@ private:
     void resizeAndSaveLargeScreenshot(Screenshot screenshot);
     void getUserDecisionAboutLargeScreenshots(QList<Screenshot> screenshotList, MainWindow *mainWindow);
     void saveThumbnail(QString filename, QImage image, quint32 width, quint32 height);
-    void checkForUpdates();
     QString getPersonalNameByUserID(QString userID);
     void getShortcutNames();
     QString getEncodingProcessOfJpeg(QFile *file);
@@ -124,7 +125,8 @@ signals:
     void sendApiKeyState(bool keyExists);
     void sendApiIndex(int index);
     void apiReachabilityChanged(bool erreichbar);
-
+    //void settingsReset();
+    void updateStatusMessage(const QString &message);
 
 
 public slots:

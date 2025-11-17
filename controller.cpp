@@ -36,6 +36,7 @@
 #include <QTime>
 #include <QPixmap>
 #include <QUrlQuery>
+#include <QStandardPaths>
 
 
 Controller::Controller(QObject *parent) : QObject(parent)
@@ -190,7 +191,10 @@ void Controller::handleUpdate(QNetworkReply *reply)
         QString latestVersion = obj.value("tag_name").toString();
         if (latestVersion.startsWith('v', Qt::CaseInsensitive)) {
             latestVersion.remove(0, 1); // entfernt das erste Zeichen 'v'
+
             qDebug() << "latestVersion GitHub: " << latestVersion;
+            QString versionInfo("Latest version: " + latestVersion);
+            emit updateStatusMessage(versionInfo);
         }
 
         QString appVersion = QCoreApplication::applicationVersion();
@@ -212,10 +216,15 @@ void Controller::handleUpdate(QNetworkReply *reply)
             }
 
             qDebug() << "Update verfügbar:" << latestVersion << ", Link:" << link;
+            QString updateMessage("Update available: " + latestVersion);
+            emit updateStatusMessage(updateMessage);
+
             emit sendUpdateInfo(latestVersion, link);
         }
     } else {
-        qDebug() << "Update check failed:" << reply->errorString();
+        QString error = reply->errorString();
+        qDebug() << "Update check failed:" << error;
+        emit updateStatusMessage("Update check failed: " + error);
     }
 
 }
@@ -1375,4 +1384,18 @@ void Controller::checkApiReachability(const QUrl &url)
 //     });
 // }
 
+
+
+void Controller::resetSettings()
+{
+    if(!settings) return;
+
+    settings->clear();
+    settings->sync();
+
+    bootStrap();
+    //emit settingsReset();
+
+        // initialisiert Pfade, Defaults, Strukturen
+}
 
