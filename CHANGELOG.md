@@ -1,4 +1,13 @@
 # SteaScreeLoaded Changelog
+
+## 1.16.0
+- Accordion effect remedied. Previously, elements of the user interface could be pressed into one another by automatic resizing and would overlap, causing them to become unintentionally concealed.
+- Status bar added.
+- Menu added: Update, Settings (Open/Reset/Delete), About, Quit.
+
+## 1.15.1
+Bug fixed: After restarting, the API settings remained visible even when the selected API did not require any settings.
+
 ## 1.15.0
 - API settings are now only displayed when required.
 - Next to the API selection, the server availability is now shown: green dot = reachable, red circle = not reachable.
