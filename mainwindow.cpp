@@ -85,6 +85,10 @@ void MainWindow::bootStrap()
                 ui->horizontalScrollBarScreenshots->setValue(current - 1);
             });
 
+    connect(controller, &Controller::apiReachabilityChanged,
+            this, &MainWindow::onApiReachabilityChanged);
+
+
 
     // Autovervollständigung für Spielnamen aktivieren
     QCompleter *completer = new QCompleter(ui->comboBox_gameID->model(), this);
@@ -756,13 +760,20 @@ void MainWindow::on_comboBox_chooseAPI_currentIndexChanged(int index)
     qDebug() << "comboBox_chooseAPI Index gewählt: " << index;
     emit apiIndexChanged(index);
 
-    if (ui->comboBox_chooseAPI->currentIndex() == 1){
-        ui->lineEditApiKey->setEnabled(true);
-    } else {
-        ui->lineEditApiKey->setEnabled(false);
-    }
+    //Notwendige Steuerelemente anzeigen/ausblenden
+    showOrHideApiSettings(index);
 
     setStatusLabelText("Games source changed, please restart the programme.", warningColor);
+
+    if(index == 2){
+        ui->label_apiCheck->setText("●");
+        ui->label_apiCheck->setToolTip("No connection needed.");
+
+    } else {
+        ui->label_apiCheck->setText("○");
+        ui->label_apiCheck->setToolTip("Status unknown.");
+    }
+    ui->label_apiCheck->setStyleSheet("color: black; font-size: 12;");
 }
 
 void MainWindow::receiveApiKeyState(bool exists)
@@ -845,5 +856,49 @@ void MainWindow::on_horizontalScrollBarScreenshots_valueChanged(int value)
 {
     if (controller)
         controller->setScreenshotIndex(value);
+}
+
+
+// Notwendige Steuerelemente anzeigen / ausblenden
+void MainWindow::showOrHideApiSettings(int index){
+
+    if (index == 1 || ui->comboBox_chooseAPI->currentIndex() == 1){
+        ui->lineEditApiKey->setEnabled(true);
+        ui->lineEditApiKey->setVisible(true);
+        ui->pushButtonApiKey->setEnabled(true);
+        ui->pushButtonApiKey->setVisible(true);
+        ui->pushButtonClearKey->setEnabled(true);
+        ui->pushButtonClearKey->setVisible(true);
+        ui->label_GetKey->setEnabled(true);
+        ui->label_GetKey->setVisible(true);
+        ui->label_APIkey->setVisible(true);
+        ui->label_APIkey->setEnabled(true);
+    } else {
+        ui->lineEditApiKey->setEnabled(false);
+        ui->lineEditApiKey->setVisible(false);
+        ui->pushButtonApiKey->setEnabled(false);
+        ui->pushButtonApiKey->setVisible(false);
+        ui->pushButtonClearKey->setEnabled(false);
+        ui->pushButtonClearKey->setVisible(false);
+        ui->label_GetKey->setEnabled(false);
+        ui->label_GetKey->setVisible(false);
+        ui->label_APIkey->setVisible(false);
+        ui->label_APIkey->setEnabled(false);
+    }
+
+}
+
+
+void MainWindow::onApiReachabilityChanged(bool erreichbar)
+{
+    if (erreichbar) {
+        ui->label_apiCheck->setText("●");
+        ui->label_apiCheck->setStyleSheet("color: green; font-size: 12;");
+        ui->label_apiCheck->setToolTip("Connection established.");
+    } else {
+        ui->label_apiCheck->setText("○");
+        ui->label_apiCheck->setStyleSheet("color: red; font-size: 12;");
+        ui->label_apiCheck->setToolTip("Connection failed.");
+    }
 }
 

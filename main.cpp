@@ -208,7 +208,6 @@ int main(int argc, char *argv[])
                      c, &Controller::setApiIndex);
 
 
-
     w.bootStrap();
     c->bootStrap();
     w.show();

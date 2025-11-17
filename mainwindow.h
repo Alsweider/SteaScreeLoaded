@@ -107,6 +107,9 @@ public slots:
     void openFolderInExplorer(const QString &path);
     void showPreviewCount(int currentIndex, int totalCount);
     void receiveApiKeyState(bool exists);
+    void showOrHideApiSettings(int index);
+    void onApiReachabilityChanged(bool erreichbar);
+
 
 
 

@@ -78,7 +78,9 @@ private:
     QStringList m_screenshotFiles;
     int m_currentScreenshotIndex = 0;
     QString apiKey;
-    int apiIndex;
+    int apiIndex = 1;
+    void checkApiReachability(const QUrl &url);
+
 
 
 
@@ -122,6 +124,9 @@ signals:
     void sendPreviewImage(QPixmap pixmap);
     void sendPreviewCount(int currentIndex, int totalCount);    
     void sendApiKeyState(bool keyExists);
+    void sendApiIndex(int index);
+    void apiReachabilityChanged(bool erreichbar);
+
 
 
 public slots:

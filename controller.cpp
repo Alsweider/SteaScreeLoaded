@@ -105,14 +105,15 @@ void Controller::readSettings()
    // int apiIndex = settings->value("ChosenAPIIndex", 0).toInt();
     // Prüfen, ob ein API-Index bereits gespeichert ist
     QVariant savedIndex = settings->value("ChosenAPIIndex");
-    //int apiIndexTemp;
+
     if (savedIndex.isValid()) {
         apiIndex = savedIndex.toInt(); // bisherige Auswahl laden
     } else {
         apiIndex = 1; // zweiter Eintrag beim ersten Start, also die API V1, die einen Key erfordert, aber funktioniert
     }
-
+    emit sendApiIndex(apiIndex);
     qDebug() << "Einstellung API comboBox Index geladen: " << apiIndex;
+
     quint32 jpegQuality = settings->value("JPEGQuality").toInt();
     if (jpegQuality < 1 || jpegQuality > 100)
         jpegQuality = defaultJpegQuality;
@@ -321,13 +322,15 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
                 qDebug() << "Alte API V1 gewählt, API-Key: " << apiKey;
 
                     // http://api.steampowered.com/<interface name>/<method name>/v<version>/?key=<api key>&format=<format>
-                    QUrl url("https://api.steampowered.com/IStoreService/GetAppList/v1/");
+                    QUrl url("https://api.steampowered.com/IStoreService/GetAppList/v1");
                     QUrlQuery query;
                     query.addQueryItem("key", apiKey);
                     query.addQueryItem("format", "json");
                     query.addQueryItem("max_results", "1000000");
                     query.addQueryItem("last_appid", "0");
                     url.setQuery(query);
+
+                    checkApiReachability(url);
 
                     // Um Verbindungsfehler auszulesen
                     QNetworkReply *reply = nam->get(QNetworkRequest(url));
@@ -351,6 +354,8 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
                     // Ohne API-Key: V2-Endpoint
                     qDebug() << "Neue API V2 gewählt (V2, kein Key nötig, aber evtl. inaktiv)";
                     QUrl url("https://api.steampowered.com/ISteamApps/GetAppList/v2"); // Adresse der aktuell inaktiven API V2
+
+                    checkApiReachability(url);
 
                     // Um Verbindungsfehler auszulesen
                     QNetworkReply *reply = nam->get(QNetworkRequest(url));
@@ -1325,5 +1330,49 @@ void Controller::setScreenshotIndex(int index)
 }
 
 
+// HEAD-Abfrage, prüft schnell und sparsam die Verfügbarkeit der API-Server, aber keine Aussage über gelieferte Daten
+void Controller::checkApiReachability(const QUrl &url)
+{
+    auto *manager = new QNetworkAccessManager(this);
+
+    QNetworkRequest request(url);
+    //request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true); //No Member FollowRedirectsAttribute in QNetworkRequest / QtVersion
+
+    QNetworkReply *reply = manager->head(request);
+
+    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+        bool erreichbar = false;
+
+        if (reply->error() == QNetworkReply::NoError) {
+            // Antwort erhalten, API lebt
+            erreichbar = true;
+        }
+
+        // Statusanzeige auf Benutzeroberfläche aktualisieren
+        emit apiReachabilityChanged(erreichbar);
+
+        reply->deleteLater();
+    });
+}
+
+// GET-Abfrage für Statusprüfung (Verursacht mehr Datenverkehr, ist langsam, aber würde aussagen, dass Daten geliefert werden)
+// void Controller::checkApiReachability(const QUrl &url)
+// {
+//     QNetworkRequest req(url);
+//     req.setRawHeader("Accept", "application/json");
+
+//     auto *mgr = new QNetworkAccessManager(this);
+//     QNetworkReply *reply = mgr->get(req);
+
+//     connect(reply, &QNetworkReply::finished, this, [=]() {
+
+//         bool erreichbar = (reply->error() == QNetworkReply::NoError);
+
+//         emit apiReachabilityChanged(erreichbar);
+
+//         reply->deleteLater();
+//         mgr->deleteLater();
+//     });
+// }
 
 

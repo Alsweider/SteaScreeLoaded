@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>956</width>
-    <height>550</height>
+    <height>564</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -38,7 +38,7 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QGridLayout" name="gridLayout_3">
+   <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
@@ -434,34 +434,6 @@
              </item>
             </layout>
            </item>
-           <item row="5" column="1">
-            <widget class="QComboBox" name="comboBox_chooseAPI">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="toolTip">
-              <string>Select a source to fill the Game ID list with names.</string>
-             </property>
-             <item>
-              <property name="text">
-               <string>Open Steam API (v2) - might not work</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Old Steam API (v1) - requires API key</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>None (local only)</string>
-              </property>
-             </item>
-            </widget>
-           </item>
            <item row="6" column="0">
             <widget class="QLabel" name="label_APIkey">
              <property name="sizePolicy">
@@ -529,7 +501,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_3">
+              <widget class="QLabel" name="label_GetKey">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                  <horstretch>0</horstretch>
@@ -630,6 +602,51 @@
               <string>Games source:</string>
              </property>
             </widget>
+           </item>
+           <item row="5" column="1">
+            <layout class="QHBoxLayout" name="horizontalLayout_3">
+             <item>
+              <widget class="QComboBox" name="comboBox_chooseAPI">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="toolTip">
+                <string>Select a source to fill the Game ID list with names.</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Open Steam API (v2) - might not work</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Old Steam API (v1) - requires API key</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>None (local only)</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="label_apiCheck">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;○&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
           <widget class="QLabel" name="label_progress">
