@@ -82,8 +82,6 @@ private:
     void checkApiReachability(const QUrl &url);
 
 
-
-
 #if defined(Q_OS_WIN32)
     const QString os = "Windows";
 #elif defined(Q_OS_LINUX)

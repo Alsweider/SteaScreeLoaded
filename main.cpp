@@ -207,6 +207,11 @@ int main(int argc, char *argv[])
     QObject::connect(&w, &MainWindow::apiIndexChanged,
                      c, &Controller::setApiIndex);
 
+    QObject::connect(c, &Controller::sendApiIndex,
+                     &w, &MainWindow::showOrHideApiSettings);
+
+
+
 
     w.bootStrap();
     c->bootStrap();
