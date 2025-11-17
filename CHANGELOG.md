@@ -1,4 +1,8 @@
 # SteaScreeLoaded Changelog
+## 1.15.0
+- API settings are now only displayed when required.
+- Next to the API selection, the server availability is now shown: green dot = reachable, red circle = not reachable.
+
 ## 1.14.1
 API switching bug fixed: A redeclaration of a global variable (the index of the API selection list) as a local variable within a method had prevented reliable switching between APIs. The index loaded from the settings file appeared to be applied, yet was in fact not used by the programme. Instead, the default index was taken. This created the impression that the open Steam API V2 was functioning once more, although it is presently unreachable.
 
