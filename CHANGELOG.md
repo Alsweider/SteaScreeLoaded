@@ -1,5 +1,10 @@
 # SteaScreeLoaded Changelog
 
+## 1.17.0
+- Reversed the order of the screenshot preview so that the most recent image in the folder appears first.
+- Copying images into the screenshot folder via the Copy button now refreshes the preview, causing the newest image to be displayed immediately.
+- Reworked the About window: links and the QR code are now clickable and the version number is displayed.
+
 ## 1.16.0
 - Accordion effect remedied. Previously, elements of the user interface could be pressed into one another by automatic resizing and would overlap, causing them to become unintentionally concealed.
 - Status bar added.
