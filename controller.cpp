@@ -835,7 +835,7 @@ void Controller::prepareScreenshots(QString userID, QString gameID, quint32 jpeg
                     getUserDecisionAboutLargeScreenshots(preparedScreenshotList, mainWindow);
                 }
                 else
-                    pushScreenshots(preparedScreenshotList);
+                    pushScreenshots(preparedScreenshotList);                
             }
             else {
                 sendLabelsVisible(QStringList() << "label_progress" << "progressBar_status", false);
@@ -1221,7 +1221,8 @@ void Controller::loadFirstScreenshotForGame(QString gameID)
     }
 
     QStringList filters = {"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tif", "*.tiff"};
-    QStringList files = dir.entryList(filters, QDir::Files, QDir::Name);
+    QStringList files = dir.entryList(filters, QDir::Files, QDir::Name | QDir::Reversed); // Reihenfolge umgekehrt, von neu nach alt sortiert
+
     // qDebug() << "Gefundene Dateien:" << files;
 
     if (files.isEmpty()) {
@@ -1236,8 +1237,14 @@ void Controller::loadFirstScreenshotForGame(QString gameID)
     QString firstImagePath = dir.absoluteFilePath(files.first());
     QPixmap pix(firstImagePath);
     // qDebug() << "loadFirstScreenshotForGame firstImagePath: " << firstImagePath;
+
     emit sendPreviewImage(pix);
-    emit sendPreviewCount(m_currentScreenshotIndex + 1, m_screenshotFiles.size());
+    //emit sendPreviewCount(m_currentScreenshotIndex + 1, m_screenshotFiles.size());
+
+    //Reihenfolge umdrehen für label_previewCount, neuestes Bild ist höchste Zahl
+    int total = m_screenshotFiles.size();
+    int displayIndex = total - m_currentScreenshotIndex;
+    emit sendPreviewCount(displayIndex, total);
 }
 
 

@@ -111,8 +111,6 @@ public slots:
     void onApiReachabilityChanged(bool erreichbar);
 
 
-
-
 private slots:
     void on_pushButton_addScreenshots_clicked();
     void on_pushButton_clearQueue_clicked();

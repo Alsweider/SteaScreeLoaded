@@ -23,6 +23,7 @@
 #include <QCompleter>
 #include <QStandardPaths>
 #include <QTextEdit>
+#include <QClipboard>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -473,6 +474,12 @@ void MainWindow::on_pushButton_copyScreenshots_clicked()
         ui->progressBar_status->setValue(0);
 
         emit sendSelectedIDs(selectedUserID, selectedGameID, jpegQuality, this);
+
+        // Anzeige aktualisieren
+        QString gameID = ui->comboBox_gameID->currentText();
+        controller->loadFirstScreenshotForGame(gameID);
+        ui->horizontalScrollBarScreenshots->setValue(0);
+
     }
 }
 
@@ -991,7 +998,7 @@ void MainWindow::on_actionReset_settings_triggered()
     }
     bootStrap();
 
-    ui->statusBar->showMessage("Settings.ini and the user interface have been reset.", 5000);
+    ui->statusBar->showMessage("The settings file and the user interface have been reset.", 5000);
 }
 
 
@@ -1005,7 +1012,7 @@ void MainWindow::on_actionOpen_settings_triggered()
         QDesktopServices::openUrl(QUrl::fromLocalFile(fileInfo.absolutePath()));
         ui->statusBar->showMessage("Settings folder opened.", 5000);
     } else {
-        qWarning("Settings.ini wurde nicht gefunden!");
+        qWarning("SteaScreeLoaded.ini wurde nicht gefunden!");
         ui->statusBar->showMessage("Settings not found!", 5000);
     }
 }
@@ -1027,47 +1034,63 @@ void MainWindow::on_action_About_triggered()
 
     // Haupttext
     QLabel *label = new QLabel(
-        "<h3>SteaScreeLoaded</h3>"
+        "<h3>SteaScreeLoaded " + progVersion + "</h3>"
         "<p>A Steam cloud screenshot upload helper.</p>"
         "<p>&copy; 2025 <a href=\"https://github.com/Alsweider\">Alsweider</a></p>"
-        "<p>This fork is based on <a href=\"https://github.com/awthwathje/SteaScree\">SteaScree</a> by Foyl and is licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.html.en\">GNU General Public License v3.0 (GPL 3.0)</a>.</p>"
+        "<p>This fork is based on <a href=\"https://github.com/awthwathje/SteaScree\">SteaScree</a> by Foyl "
+        "and is licensed under the "
+        "<a href=\"https://www.gnu.org/licenses/gpl-3.0.html.en\">GNU GPL 3.0</a>.</p>"
         "<hr>"
-        "<p>If you enjoy using this software, you are welcome to support the author through:</p>"
+        "<p>If you enjoy using this software, you are welcome to support the author:</p>"
         "<p>Ko-Fi: <a href=\"https://ko-fi.com/alsweider\">https://ko-fi.com/alsweider</a></p>"
         "<p>Monero (XMR):</p>"
         );
     label->setTextFormat(Qt::RichText);
-    label->setAlignment(Qt::AlignHCenter | Qt::AlignTop);  // horizontal zentriert
-    label->setTextInteractionFlags(Qt::TextBrowserInteraction); // Links klickbar
+    label->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
+    label->setTextInteractionFlags(Qt::TextBrowserInteraction);   // Links klickbar
+    label->setOpenExternalLinks(true);
     layout->addWidget(label);
 
-    // QR-Code
-    QLabel *qrLabel = new QLabel;
+    // --- Monero-Adresse ---
+    const QString moneroAddress =
+        "88o74DJuHyxNr8rFkbH2xaFKkN35jiUcS12htB13SNPVVrzA4zX4ruJj8AXURrR3ssMni8zeQZHAjV6aFYwNUZy8AwT5c8M";
+
+    // --- QR-Button ---
+    QPushButton *qrButton = new QPushButton;
     QPixmap qrPixmap(":/res/misc/moneroQR.png");
-    qrLabel->setPixmap(qrPixmap.scaled(150,150,Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    qrLabel->setAlignment(Qt::AlignHCenter);
-    layout->addWidget(qrLabel);
 
-    // Kopierbares Feld für Monero-Adresse
-    QTextEdit *moneroField = new QTextEdit("88o74DJuHyxNr8rFkbH2xaFKkN35jiUcS12htB13SNPVVrzA4zX4ruJj8AXURrR3ssMni8zeQZHAjV6aFYwNUZy8AwT5c8M");
+    qrButton->setIcon(qrPixmap);
+    qrButton->setIconSize(QSize(150,150));
+    qrButton->setFixedSize(160,160);               // schöner Rahmen
+    qrButton->setFlat(true);                       // noch schöner
+    qrButton->setCursor(Qt::PointingHandCursor);   // Handzeiger
+    qrButton->setToolTip("Copy XMR address");
+
+    layout->addWidget(qrButton, 0, Qt::AlignHCenter);
+
+    // Klick auf QR-Button -> Monero-Adresse kopieren
+    connect(qrButton, &QPushButton::clicked, this, [moneroAddress](){
+        QClipboard *clipboard = QApplication::clipboard();
+        clipboard->setText(moneroAddress);
+    });
+
+    // Kopierfeld
+    QTextEdit *moneroField = new QTextEdit(moneroAddress);
     moneroField->setReadOnly(true);
-    // moneroField->setAlignment(Qt::AlignCenter);       // Text zentrieren
-    moneroField->setLineWrapMode(QTextEdit::NoWrap);  // kein automatisches Umbrechen
-    moneroField->setMaximumWidth(400);                // Breite begrenzen
-    moneroField->setFixedHeight(50);                  // Höhe anpassen
+    moneroField->setLineWrapMode(QTextEdit::NoWrap);
+    moneroField->setMaximumWidth(400);
+    moneroField->setFixedHeight(50);
 
-    // Wrapper für horizontale Zentrierung
     QHBoxLayout *hLayout = new QHBoxLayout;
     hLayout->addStretch();
     hLayout->addWidget(moneroField);
     hLayout->addStretch();
     layout->addLayout(hLayout);
 
-    // Schließen-Button
+    // Schließen-Schaltfläche
     QPushButton *closeBtn = new QPushButton("Close");
     connect(closeBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
 
-    // Button ebenfalls zentrieren
     QHBoxLayout *buttonLayout = new QHBoxLayout;
     buttonLayout->addStretch();
     buttonLayout->addWidget(closeBtn);
@@ -1075,65 +1098,15 @@ void MainWindow::on_action_About_triggered()
     layout->addLayout(buttonLayout);
 
     dialog.exec();
-
- //    QDialog dialog(this);
- //    dialog.setWindowTitle("Über SteaScreeLoaded");
-
- //    QVBoxLayout *layout = new QVBoxLayout(&dialog);
-
- //    QLabel *label = new QLabel(
- //        "<h3>SteaScreeLoaded</h3>"
- //        "<p>A Steam cloud screenshot upload helper.</p>"
- //        "<p>&copy; 2025 <a href=\"https://github.com/Alsweider\">Alsweider</a></p>"
- //        "<p>This fork is based on <a href=\"https://github.com/awthwathje/SteaScree\">SteaScree</a> by Foyl and is licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\">GNU General Public License v3.0 (GPL 3.0)</a>.</p>"
- //        "<hr>"
- //        "<p><p>If you enjoy using this software, you are welcome to support the author through:</p>"
- //        "<p><a href=\"https://ko-fi.com/alsweider\">Ko-fi</a></p>"
- //        "<p>Monero:</p>"
- //         );
- //    label->setTextFormat(Qt::RichText);
- //    label->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter); // horizontal + vertikal
- //    label->setTextInteractionFlags(Qt::TextBrowserInteraction); // Links klickbar
- //    layout->addWidget(label);
-
- //    // Kopierbares Feld für Monero-Adresse
- //    QTextEdit *moneroField = new QTextEdit("88o74DJuHyxNr8rFkbH2xaFKkN35jiUcS12htB13SNPVVrzA4zX4ruJj8AXURrR3ssMni8zeQZHAjV6aFYwNUZy8AwT5c8M");
- //    moneroField->setReadOnly(true);
- // //   moneroField->setFixedHeight(50);
- //    moneroField->setMaximumWidth(150);
- //    moneroField->setAlignment(Qt::AlignCenter);
- //    moneroField->setLineWrapMode(QTextEdit::NoWrap);
- //    layout->addWidget(moneroField);
-
-
- //    QPushButton *closeBtn = new QPushButton("Close");
- //    connect(closeBtn, &QPushButton::clicked, &dialog, &QDialog::accept);
- //    layout->addWidget(closeBtn);
-
- //    dialog.exec();
-
- //    // QMessageBox aboutBox(this);
- //    // aboutBox.setWindowTitle("About SteaScreeLoaded");
- //    // aboutBox.setText(
- //    //     "<h3>SteaScreeLoaded</h3>"
- //    //     "<p>A Steam cloud screenshot upload helper.</p>"
- //    //     "<p>&copy; 2025 <a href=\"https://github.com/Alsweider\">Alsweider</a></p>"
- //    //     "<p>This fork is based on <a href=\"https://github.com/awthwathje/SteaScree\">SteaScree</a> by Foyl and is licensed under the <a href=\"https://www.gnu.org/licenses/gpl-3.0.en.html\">GNU General Public License v3.0 (GPL 3.0)</a>.</p>"
- //    //     "<hr>"
- //    //     "<p><p>If you enjoy using this software, you are welcome to support the author through:</p>"
- //    //     "<ul>"
- //    //     "<li><a href=\"https://ko-fi.com/alsweider\">Ko-fi</a></li>"
- //    //     "<li>Monero: <code>88o74DJuHyxNr8rFkbH2xaFKkN35jiUcS12htB13SNPVVrzA4zX4ruJj8AXURrR3ssMni8zeQZHAjV6aFYwNUZy8AwT5c8M</code></li>"
- //    //     "</ul>"
- //    //     );
- //    // aboutBox.setIcon(QMessageBox::Information);
- //    // aboutBox.exec();
 }
 
 
 void MainWindow::on_actionDelete_settings_triggered()
 {
     controller->resetOnClose = true;
-    ui->statusBar->showMessage("Settings.ini is removed upon closing the programme.", 5000);
+    ui->statusBar->showMessage("The settings file is removed upon closing the programme.", 5000);
 }
+
+
+
 
