@@ -1,5 +1,12 @@
 # SteaScreeLoaded Changelog
 
+## 1.18.0
+- Workflow enhancement: A check has been implemented to determine whether Steam is still running. If the Steam process is detected, or if there is no method available to check for the operating system in use, a warning message will appear. If the Steam process is not found, the "Prepare screenshots for uploading" button now functions immediately. This removes the need for the manual confirmation that was previously required each time.
+- The scrollbar now moves directly to the most recent image (maximum position) after copying images.
+- Loading of the footer has been moved from the constructor to the bootstrap function; otherwise, the footer would be ignored when the user interface is reset.
+- The footer has been revised. Licence information is now shown only in the About window.
+- Shortcuts have been added for the menu bar.
+
 ## 1.17.0
 - Reversed the order of the screenshot preview so that the most recent image in the folder appears first.
 - Copying images into the screenshot folder via the Copy button now refreshes the preview, causing the newest image to be displayed immediately.
