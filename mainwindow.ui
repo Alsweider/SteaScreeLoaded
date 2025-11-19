@@ -890,7 +890,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>If all screesnhots are copied to all game directories, push this and the VDF file will be updated.</string>
+             <string>If all screesnhots are copied to all game directories, push this and the VDF file will be updated. Make sure Steam is closed!</string>
             </property>
             <property name="layoutDirection">
              <enum>Qt::LeftToRight</enum>
@@ -1138,7 +1138,6 @@
     <property name="title">
      <string>&amp;Menu</string>
     </property>
-    <addaction name="action_Update"/>
     <addaction name="action_Quit"/>
    </widget>
    <widget class="QMenu" name="menuSettings">
@@ -1153,6 +1152,7 @@
     <property name="title">
      <string>&amp;Info</string>
     </property>
+    <addaction name="action_Update"/>
     <addaction name="action_About"/>
    </widget>
    <addaction name="menu_Menu"/>
@@ -1167,6 +1167,9 @@
    <property name="toolTip">
     <string>About this programme</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
+   </property>
   </action>
   <action name="action_Update">
    <property name="text">
@@ -1174,6 +1177,9 @@
    </property>
    <property name="toolTip">
     <string>Check for latest version</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+U</string>
    </property>
   </action>
   <action name="actionOpen_settings">
@@ -1183,6 +1189,9 @@
    <property name="toolTip">
     <string>Open settings folder</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
   </action>
   <action name="actionReset_settings">
    <property name="text">
@@ -1190,6 +1199,9 @@
    </property>
    <property name="toolTip">
     <string>Reset settings and user interface</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
    </property>
   </action>
   <action name="actionDelete_settings">
@@ -1203,6 +1215,9 @@
   <action name="action_Quit">
    <property name="text">
     <string>&amp;Quit</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
  </widget>

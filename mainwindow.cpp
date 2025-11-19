@@ -24,6 +24,7 @@
 #include <QStandardPaths>
 #include <QTextEdit>
 #include <QClipboard>
+#include <QRandomGenerator>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -31,7 +32,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setFooter();
 }
 
 
@@ -102,6 +102,8 @@ void MainWindow::bootStrap()
     completer->setFilterMode(Qt::MatchContains);           // auch Teiltreffer in der Mitte erlauben
     completer->setCompletionMode(QCompleter::PopupCompletion); // Vorschläge in Dropdown anzeigen
     ui->comboBox_gameID->setCompleter(completer);
+
+    setFooter();
 }
 
 
@@ -376,31 +378,53 @@ void MainWindow::setJpegQualityValue(quint32 jpegQualityValue)
 
 void MainWindow::prepareScreenshots(quint32 addedLines)
 {
-    if ( addedLines > 0 ) {
+    // Prüfen, ob Steam läuft
+    bool steamState = isSteamRunning();
 
-        QMessageBox msgBox(this);
-        msgBox.setIcon(QMessageBox::Warning);
+    // Wenn Steam läuft oder nicht festgestellt werden kann, sofort warnen und abbrechen
+    if (isSteamRunning()) {
+        QMessageBox msg(this);
+        msg.setIcon(QMessageBox::Warning);
+        msg.setWindowTitle("Steam must be closed");
+        msg.setText("Steam appears to be running.");
+        msg.setInformativeText("This programme requires Steam to be fully closed before it can proceed. "
+                               "If you are certain that no interfering Steam process is active, "
+                               "you may continue at your own risk.");
+        msg.setStandardButtons(QMessageBox::Abort | QMessageBox::Ignore);
+        msg.setDefaultButton(QMessageBox::Abort);
 
-        QString text = "Steam has to be quitted.";
-        QString info = "This program only works when Steam exited. It will not try to determine if Steam is running or not, so you should be sure it is quitted. " +
-                QString("If it is not, it is safe to exit Steam now. <br><br>Is Steam exited now?");
-        msgBox.setText(text);
-        msgBox.setInformativeText(info);
-        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        msgBox.setDefaultButton(QMessageBox::Yes);
+        int ret = msg.exec();
+        if (ret == QMessageBox::Abort) {
+            return; // Abbrechen
+        }
+        // Bei Ignore fortsetzen trotz wahrscheinlicher Risiken
+    }
 
-        makeWideMessageBox(&msgBox, 500);
+    if (addedLines > 0){
 
-        int ret = msgBox.exec();
+        // QMessageBox msgBox(this);
+        // msgBox.setIcon(QMessageBox::Warning);
 
-        if ( ret == QMessageBox::Yes ) {
+        // QString text = "Steam has to be quitted.";
+        // QString info = "This programme only works when Steam has exited. "
+        //                "If it is still running, it is safe to close Steam now. "
+        //                 "<br><br>Is Steam closed now?";
+        // msgBox.setText(text);
+        // msgBox.setInformativeText(info);
+        // msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        // msgBox.setDefaultButton(QMessageBox::Yes);
+
+        // makeWideMessageBox(&msgBox, 500);
+
+        // int ret = msgBox.exec();
+
+        // if ( ret == QMessageBox::Yes ) {
 
             setDirStatusLabelsVisible(false);
             setLabelsText(QStringList() << "label_infoScreenshots" << "label_infoDirectories", "0");
             ui->pushButton_prepare->setDisabled(true);
 
             emit writeVDF();
-
             emit clearScreenshotPathsPool();
             emit clearState();
 
@@ -409,12 +433,11 @@ void MainWindow::prepareScreenshots(quint32 addedLines)
             QMessageBox msgBox(this);
             msgBox.setIcon(QMessageBox::Information);
             msgBox.setText("SteaScreeLoaded has updated the VDF-file.");
-            msgBox.setInformativeText("Now you can start Steam as usual and upload screenshots to the Steam Cloud.");
+            msgBox.setInformativeText("You may now start Steam as usual and upload screenshots to the Steam Cloud.");
             msgBox.exec();
-        }
+        // }
 
     } else {
-
         QMessageBox msgBox(this);
         msgBox.setIcon(QMessageBox::Warning);
         msgBox.setText("All screenshots from the upload queue are already in the screenshots.vdf file.");
@@ -478,7 +501,7 @@ void MainWindow::on_pushButton_copyScreenshots_clicked()
         // Anzeige aktualisieren
         QString gameID = ui->comboBox_gameID->currentText();
         controller->loadFirstScreenshotForGame(gameID);
-        ui->horizontalScrollBarScreenshots->setValue(0);
+        ui->horizontalScrollBarScreenshots->setValue(ui->horizontalScrollBarScreenshots->maximum()); // Nach Kopieren auf das neueste Bild im Ordner setzen
 
     }
 }
@@ -579,12 +602,14 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 // }
 
+
 void MainWindow::setController(Controller *ctrl)
 {
     controller = ctrl;
     connect(controller, &Controller::sendPreviewImage,
             this, &MainWindow::showPreviewImage);
 }
+
 
 void MainWindow::setFooter(){
 
@@ -596,23 +621,22 @@ void MainWindow::setFooter(){
     // Stilfarbe
     ui->labelFooter->setStyleSheet("color: grey");
 
-    // Rich-Text mit Links
+        QStringList icons = { "🎁", "🔔", "🏺", "★", "♥", "✦","🌱",
+                             "⭐" "🍃", "✨", "🌳", "⚜️", "❧", "❦",
+                             "✽", "❂", "🐝", "🍯", "🐻", "🐺", "🦉"};
+        QString iconDonations = icons.at(QRandomGenerator::global()->bounded(icons.size()));
+        QString iconDonationsColour = "#D4AF37";
+
     QString footer = QString(
                          "<span style='color: grey; text-decoration: none;'>"
                          "<a href='https://github.com/Alsweider/SteaScreeLoaded' style='text-decoration: none;'>%1</a> "
-                         "v%2 by Alsweider, © 2025, "
-                         "<a href='https://www.gnu.org/licenses/gpl-3.0.html' style='text-decoration: none;'>GPL 3.0</a>"
+                         "v%2 by Alsweider, © 2025"
                          "</span>"
                          " <br> "
-                         "<a href='https://ko-fi.com/alsweider' style='color: red; text-decoration: none;'>♥ </a>"
-                         "<a href='https://ko-fi.com/alsweider' style='text-decoration: none;'>Support development</a>"
-                         ).arg(progName, progVersion);
+                         "<a href='https://ko-fi.com/alsweider' style='text-decoration: none;'><span style='color: %3;'>%4</span> 𝒮upport ₰evelopment</a>"
+                         ).arg(progName, progVersion, iconDonationsColour, iconDonations);
 
-    // Text setzen
     ui->labelFooter->setText(footer);
-
-
-
 }
 
 
@@ -1107,6 +1131,51 @@ void MainWindow::on_actionDelete_settings_triggered()
     ui->statusBar->showMessage("The settings file is removed upon closing the programme.", 5000);
 }
 
+
+bool MainWindow::isSteamRunning()
+{
+#ifdef Q_OS_WIN
+    QStringList processNames = {"steam.exe", "steamwebhelper.exe", "steamservice.exe"};
+    QProcess process;
+    for (const QString &name : processNames) {
+        process.start("tasklist", QStringList() << "/FI" << QString("IMAGENAME eq %1").arg(name));
+        process.waitForFinished(1000); // Timeout 1s
+        QString output = process.readAllStandardOutput();
+        if (output.contains(name, Qt::CaseInsensitive)) {
+            return true;
+        }
+    }
+    return false;
+
+#elif defined(Q_OS_LINUX)
+    QStringList processNames = {"steam", "steamwebhelper"};
+    QProcess process;
+    for (const QString &name : processNames) {
+        process.start("pgrep", QStringList() << name);
+        process.waitForFinished();
+        if (process.exitCode() == 0) {
+            return true;
+        }
+    }
+    return false;
+
+#elif defined(Q_OS_MACOS)
+    QStringList processNames = {"steam_osx", "steamwebhelper_osx"};
+    QProcess process;
+    for (const QString &name : processNames) {
+        process.start("pgrep", QStringList() << name);
+        process.waitForFinished();
+        if (process.exitCode() == 0) {
+            return true;
+        }
+    }
+    return false;
+
+#else
+    // Unbekanntes System, kann nicht prüfen, Warnung erzwingen
+    return true;
+#endif
+}
 
 
 

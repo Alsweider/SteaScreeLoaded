@@ -54,6 +54,7 @@ private:
     void updateComboBoxNames();
     QString progVersion = APP_VERSION;
     QString progName = APP_NAME;
+    bool isSteamRunning();
 
 
 signals:

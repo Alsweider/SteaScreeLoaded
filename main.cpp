@@ -5,7 +5,6 @@
 #include <QtGlobal>
 #include <QtDebug>
 #include <QTextStream>
-//#include <QTextCodec>
 #include <QLocale>
 #include <QTime>
 #include <QFile>
