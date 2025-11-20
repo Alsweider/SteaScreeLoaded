@@ -500,6 +500,11 @@
                  <string>None (local only)</string>
                 </property>
                </item>
+               <item>
+                <property name="text">
+                 <string>Local JSON file (download from mirror)</string>
+                </property>
+               </item>
               </widget>
              </item>
              <item>

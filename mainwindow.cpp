@@ -379,9 +379,7 @@ void MainWindow::setJpegQualityValue(quint32 jpegQualityValue)
 void MainWindow::prepareScreenshots(quint32 addedLines)
 {
     // Prüfen, ob Steam läuft
-    bool steamState = isSteamRunning();
-
-    // Wenn Steam läuft oder nicht festgestellt werden kann, sofort warnen und abbrechen
+    // Wenn Steam läuft oder nicht festgestellt werden kann, sofort warnen
     if (isSteamRunning()) {
         QMessageBox msg(this);
         msg.setIcon(QMessageBox::Warning);
@@ -397,7 +395,7 @@ void MainWindow::prepareScreenshots(quint32 addedLines)
         if (ret == QMessageBox::Abort) {
             return; // Abbrechen
         }
-        // Bei Ignore fortsetzen trotz wahrscheinlicher Risiken
+        // Bei Ignore fortsetzen (falls automatische Prüfung fehlerhaft ist)
     }
 
     if (addedLines > 0){
@@ -613,6 +611,8 @@ void MainWindow::setController(Controller *ctrl)
 
 void MainWindow::setFooter(){
 
+    ui->labelFooter->clear();
+
     // Links klickbar machen
     ui->labelFooter->setTextFormat(Qt::RichText);
     ui->labelFooter->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -622,7 +622,7 @@ void MainWindow::setFooter(){
     ui->labelFooter->setStyleSheet("color: grey");
 
         QStringList icons = { "🎁", "🔔", "🏺", "★", "♥", "✦","🌱",
-                             "⭐" "🍃", "✨", "🌳", "⚜️", "❧", "❦",
+                             "⭐", "🍃", "✨", "🌳", "⚜️", "❧", "❦",
                              "✽", "❂", "🐝", "🍯", "🐻", "🐺", "🦉"};
         QString iconDonations = icons.at(QRandomGenerator::global()->bounded(icons.size()));
         QString iconDonationsColour = "#D4AF37";

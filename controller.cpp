@@ -110,7 +110,7 @@ void Controller::readSettings()
     if (savedIndex.isValid()) {
         apiIndex = savedIndex.toInt(); // bisherige Auswahl laden
     } else {
-        apiIndex = 1; // zweiter Eintrag beim ersten Start, also die API V1, die einen Key erfordert, aber funktioniert
+        apiIndex = 3; // Lokale games.json bzw. Download von Mirror. Aktuell zuverlässigste und schnellste Methode.
     }
     emit sendApiIndex(apiIndex);
     qDebug() << "Einstellung API comboBox Index geladen: " << apiIndex;
@@ -335,7 +335,7 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
                     QUrlQuery query;
                     query.addQueryItem("key", apiKey);
                     query.addQueryItem("format", "json");
-                    query.addQueryItem("max_results", "1000000");
+                    query.addQueryItem("max_results", "9999999");
                     query.addQueryItem("last_appid", "0");
                     url.setQuery(query);
 
@@ -384,8 +384,25 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
                     //                  this, &Controller::getGameNamesV2);
 
                     // nam->get(QNetworkRequest(url));
-            } else { //Keine externen API-Anfragen //  (apiIndex == 2)
+            } else if (apiIndex == 2){ //Keine externen API-Anfragen //  (apiIndex == 2)
                 qDebug() << "Index " << apiIndex << ". Keine API-Anfragen, nur lokale IDs nutzen";
+                fillGameIDs(userID);
+            } else if (apiIndex == 3) {
+                // JSON laden
+                qDebug() << "API = JSON local/mirror";
+
+                QUrl url("https://raw.githubusercontent.com/Alsweider/SteaScreeLoaded/refs/heads/master/games.json");
+                checkApiReachability(url);
+
+                QByteArray localJson = loadJsonLocal().toUtf8();
+                if (!localJson.isEmpty()) {
+                    parseJson(localJson);
+                } else {
+                    emit sendToComboBox("comboBox_gameID", QStringList() << "Downloading JSON...");
+                    loadJsonFromGithub();
+                }
+            } else {
+                qDebug() << "Index " << apiIndex << ". Falscher Index?";
                 fillGameIDs(userID);
             }
 
@@ -1392,7 +1409,6 @@ void Controller::checkApiReachability(const QUrl &url)
 // }
 
 
-
 void Controller::resetSettings()
 {
     if(!settings) return;
@@ -1402,7 +1418,77 @@ void Controller::resetSettings()
 
     bootStrap();
     //emit settingsReset();
-
-        // initialisiert Pfade, Defaults, Strukturen
 }
+
+
+
+QString Controller::loadJsonLocal()
+{
+    QString path = QCoreApplication::applicationDirPath() + "/games.json";
+    QFile file(path);
+
+    emit updateStatusMessage("Loading games.json from local folder: " + path);
+
+    if (!file.exists())
+        return ""; // nicht vorhanden
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return "";
+
+    qDebug() << "loadJsonLocal(): JSON found!";
+
+    return file.readAll();
+}
+
+
+void Controller::loadJsonFromGithub()
+{
+    QString url = "https://raw.githubusercontent.com/Alsweider/SteaScreeLoaded/refs/heads/master/games.json";
+
+    QNetworkAccessManager *nam = new QNetworkAccessManager(this);
+    QNetworkReply *reply = nam->get(QNetworkRequest(QUrl(url)));
+
+    QObject::connect(reply, &QNetworkReply::finished, this, [=]() {
+        if (reply->error() != QNetworkReply::NoError) {
+            qDebug() << "Mirror download failed:" << reply->errorString();
+            emit sendToComboBox("comboBox_gameID", QStringList() << "JSON download failed");
+            emit updateStatusMessage("JSON download from online source failed.");
+            return;
+        }
+        qDebug() << "loadJsonFromGithub(): JSON found!";
+        emit updateStatusMessage("Loading games.json from online source.");
+
+        QByteArray raw = reply->readAll();
+
+        // lokal speichern
+        QString path = QCoreApplication::applicationDirPath() + "/games.json";
+        QFile file(path);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text))
+            file.write(raw);
+
+        parseJson(raw);
+    });
+}
+
+
+void Controller::parseJson(const QByteArray &raw)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(raw);
+    if (!doc.isObject())
+        return;
+
+    QJsonObject obj = doc.object();
+    games.clear();
+
+    for (auto it = obj.begin(); it != obj.end(); ++it) {
+        QString appID = it.key();
+        QString name  = it.value().toString();
+        games[appID] = name;
+    }
+
+    fillGameIDs(userID);
+}
+
+
+
 

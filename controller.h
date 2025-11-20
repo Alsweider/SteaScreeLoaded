@@ -81,6 +81,9 @@ private:
     QString apiKey;
     int apiIndex = 1;
     void checkApiReachability(const QUrl &url);
+    QString loadJsonLocal();
+    void loadJsonFromGithub();
+    void parseJson(const QByteArray &raw);
 
 
 #if defined(Q_OS_WIN32)
