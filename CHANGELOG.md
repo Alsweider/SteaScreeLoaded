@@ -2,7 +2,7 @@
 
 ## 1.19.0
 Load game names more reliably and quickly: Under "Games source", you can now select "Local JSON file". This will download a JSON of roughly 12 MB into the programme folder. Once present, the game names will be immediately available at every start.
-The JSON is a stripped-down mirror of the old API [ISteamApps/GetAppList/v1](https://api.steampowered.com/ISteamApps/GetAppList/v1), meaning it may be out of date, but in most cases it should currently be the best option. The JSON schema is `"ID": "Name"`, for example:
+The JSON is a stripped-down mirror of the old API [ISteamApps/GetAppList/v1](https://api.steampowered.com/ISteamApps/GetAppList/v1), meaning it may be out of date, but in most cases it should currently be the best option. The JSON schema is `{"ID": "Name", "ID2": "Name 2"}`, for example:
 
 `{
     "10": "Counter-Strike",
