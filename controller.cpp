@@ -1238,7 +1238,9 @@ void Controller::loadFirstScreenshotForGame(QString gameID)
     }
 
     QStringList filters = {"*.jpg", "*.jpeg", "*.png", "*.bmp", "*.tif", "*.tiff"};
-    QStringList files = dir.entryList(filters, QDir::Files, QDir::Name | QDir::Reversed); // Reihenfolge umgekehrt, von neu nach alt sortiert
+    // QStringList files = dir.entryList(filters, QDir::Files, QDir::Name | QDir::Reversed); // Reihenfolge umgekehrt, von neu nach alt sortiert
+    QStringList files = dir.entryList(filters, QDir::Files, QDir::Name);
+
 
     // qDebug() << "Gefundene Dateien:" << files;
 
@@ -1249,19 +1251,27 @@ void Controller::loadFirstScreenshotForGame(QString gameID)
 
     // Bilderliste speichern
     m_screenshotFiles = files;
-    m_currentScreenshotIndex = 0;
+    m_currentScreenshotIndex = files.size() - 1;
 
-    QString firstImagePath = dir.absoluteFilePath(files.first());
+    // m_currentScreenshotIndex = 0;
+
+    // QString firstImagePath = dir.absoluteFilePath(files.first());
+    QString firstImagePath = dir.absoluteFilePath(files[m_currentScreenshotIndex]);
+
     QPixmap pix(firstImagePath);
     // qDebug() << "loadFirstScreenshotForGame firstImagePath: " << firstImagePath;
 
     emit sendPreviewImage(pix);
-    //emit sendPreviewCount(m_currentScreenshotIndex + 1, m_screenshotFiles.size());
+    // emit sendPreviewCount(m_currentScreenshotIndex + 1, m_screenshotFiles.size());
 
     //Reihenfolge umdrehen für label_previewCount, neuestes Bild ist höchste Zahl
-    int total = m_screenshotFiles.size();
-    int displayIndex = total - m_currentScreenshotIndex;
-    emit sendPreviewCount(displayIndex, total);
+    // int total = m_screenshotFiles.size();
+    // int displayIndex = total - m_currentScreenshotIndex;
+    // emit sendPreviewCount(displayIndex, total);
+  //  int total = m_screenshotFiles.size();
+    emit sendPreviewCount(m_currentScreenshotIndex + 1, files.size());
+
+    // emit sendPreviewCount(m_currentScreenshotIndex +1, total);
 }
 
 
@@ -1360,6 +1370,8 @@ void Controller::setScreenshotIndex(int index)
 
     emit sendPreviewImage(QPixmap(imgPath));
     emit sendPreviewCount(index + 1, m_screenshotFiles.size());
+
+
 }
 
 
