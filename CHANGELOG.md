@@ -1,5 +1,8 @@
 # SteaScreeLoaded Changelog
 
+## 1.19.1
+Corrected the order of the preview images: the oldest images are on the left and the newest on the right. "Age" does not refer to the date of copying or uploading, but to the moment the original file was created. This moment determines the file name in the screenshot folder, and that file name in turn forms the basis of the sorting. This means that if an older image is copied into the screenshot folder using the programme, it will not appear on the far right, but in the position corresponding to its timestamp. When switching the game in the game-ID list and when starting the programme, the view is first moved to the newest image on the far right, which quite naturally is not necessarily the one most recently copied.
+
 ## 1.19.0
 Load game names more reliably and quickly: Under "Games source", you can now select "Local JSON file". This will download a JSON of roughly 12 MB into the programme folder. Once present, the game names will be immediately available at every start.
 The JSON is a stripped-down mirror of the old API [ISteamApps/GetAppList/v1](https://api.steampowered.com/ISteamApps/GetAppList/v1), meaning it may be out of date, but in most cases it should currently be the best option. The JSON schema is `{"ID": "Name", "ID2": "Name 2"}`, for example:
