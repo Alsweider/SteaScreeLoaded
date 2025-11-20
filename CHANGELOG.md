@@ -1,5 +1,18 @@
 # SteaScreeLoaded Changelog
 
+## 1.19.0
+Load game names more reliably and quickly: Under "Games source", you can now select "Local JSON file". This will download a JSON of roughly 12 MB into the programme folder. Once present, the game names will be immediately available at every start.
+The JSON is a stripped-down mirror of the old API [ISteamApps/GetAppList/v1](https://api.steampowered.com/ISteamApps/GetAppList/v1), meaning it may be out of date, but in most cases it should currently be the best option. The JSON schema is `"ID": "Name"`, for example:
+
+`{
+    "10": "Counter-Strike",
+    "100": "Counter-Strike: Condition Zero Deleted Scenes",
+    "10000": "Enemy Territory: Quake Wars",
+    "1000000": "ASCENXION",
+    "999990": "Bouncing Hero"
+}
+`
+
 ## 1.18.0
 - Workflow enhancement: A check has been implemented to determine whether Steam is still running. If the Steam process is detected, or if there is no method available to check for the operating system in use, a warning message will appear. If the Steam process is not found, the "Prepare screenshots for uploading" button now functions immediately. This removes the need for the manual confirmation that was previously required each time.
 - The scrollbar now moves directly to the most recent image (maximum position) after copying images.
