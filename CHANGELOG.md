@@ -1,5 +1,8 @@
 # SteaScreeLoaded Changelog
 
+## 1.20.0
+API key obfuscation added: the key is now encrypted and decrypted using [Tiny-AES](https://github.com/kokke/tiny-AES-c) (AES-256), so it no longer appears in plain text in the settings file. Since the key is not tied to a specific user (no individual password is required), this does not protect against determined attackers, but it prevents the merely curious, basic malware, scripts, third-party applications and file scanners from reading it easily and generating unwanted traffic that could trigger the key's suspension. As the Steam API key does not permit any security-critical actions, this should be an appropriate safeguard that imposes no additional burden on the user.
+
 ## 1.19.1
 Corrected the order of the preview images: the oldest images are on the left and the newest on the right. "Age" does not refer to the date of copying or uploading, but to the moment the original file was created. This moment determines the file name in the screenshot folder, and that file name in turn forms the basis of the sorting. This means that if an older image is copied into the screenshot folder using the programme, it will not appear on the far right, but in the position corresponding to its timestamp. When switching the game in the game-ID list and when starting the programme, the view is first moved to the newest image on the far right, which quite naturally is not necessarily the one most recently copied.
 
