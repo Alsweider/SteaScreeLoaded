@@ -25,6 +25,7 @@
 #include <QTextEdit>
 #include <QClipboard>
 #include <QRandomGenerator>
+#include <QToolTip>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -956,13 +957,6 @@ void MainWindow::on_pushButtonResetName_clicked()
 }
 
 
-void MainWindow::on_horizontalSliderScreenshots_valueChanged(int value)
-{
-    if (controller)
-        controller->setScreenshotIndex(value);
-}
-
-
 void MainWindow::on_horizontalScrollBarScreenshots_valueChanged(int value)
 {
     if (controller)
@@ -1061,7 +1055,7 @@ void MainWindow::on_action_About_triggered()
         "<h3>SteaScreeLoaded " + progVersion + "</h3>"
         "<p>A Steam cloud screenshot upload helper.</p>"
         "<p>&copy; 2025 <a href=\"https://github.com/Alsweider\">Alsweider</a></p>"
-        "<p>This fork is based on <a href=\"https://github.com/awthwathje/SteaScree\">SteaScree</a> by Foyl "
+        "<p><a href=\"https://github.com/Alsweider/SteaScreeLoaded\">SteaScreeLoaded</a> is a fork based on <a href=\"https://github.com/awthwathje/SteaScree\">SteaScree</a> by Foyl "
         "and is licensed under the "
         "<a href=\"https://www.gnu.org/licenses/gpl-3.0.html.en\">GNU GPL 3.0</a>.</p>"
         "<hr>"
@@ -1093,10 +1087,16 @@ void MainWindow::on_action_About_triggered()
     layout->addWidget(qrButton, 0, Qt::AlignHCenter);
 
     // Klick auf QR-Button -> Monero-Adresse kopieren
-    connect(qrButton, &QPushButton::clicked, this, [moneroAddress](){
-        QClipboard *clipboard = QApplication::clipboard();
-        clipboard->setText(moneroAddress);
+    connect(qrButton, &QPushButton::clicked, this, [this, qrButton, moneroAddress](){
+        QApplication::clipboard()->setText(moneroAddress);
+        QToolTip::showText(qrButton->mapToGlobal(QPoint(0, qrButton->height())),
+                           "XMR Address copied to clipboard");
     });
+
+    // connect(qrButton, &QPushButton::clicked, this, [moneroAddress](){
+    //     QClipboard *clipboard = QApplication::clipboard();
+    //     clipboard->setText(moneroAddress);
+    // });
 
     // Kopierfeld
     QTextEdit *moneroField = new QTextEdit(moneroAddress);

@@ -37,6 +37,8 @@
 #include <QPixmap>
 #include <QUrlQuery>
 #include <QStandardPaths>
+#include "aes.hpp" // Tiny-AES
+
 
 
 Controller::Controller(QObject *parent) : QObject(parent)
@@ -78,6 +80,10 @@ void Controller::bootStrap()
         setUserDataPaths(steamDir);
     }
 
+
+
+
+
 }
 
 
@@ -102,8 +108,20 @@ void Controller::readSettings()
     lastSelectedScreenshotDir = settings->value("Screenshots", QDir::currentPath()).toString();
     lastSelectedUserID = settings->value("UserID").toString();
     lastSelectedGameID = settings->value("GameID").toString();
-    apiKey = settings->value("ApiKey").toString();
-   // int apiIndex = settings->value("ChosenAPIIndex", 0).toInt();
+
+    // apiKey = settings->value("ApiKey").toString();
+
+    // API-Key entschlüsseln
+    QString storedApiKey = settings->value("ApiKey").toString();
+    qDebug() << "Verschlüsselter apiKey: " << storedApiKey;
+    if (!storedApiKey.isEmpty()){
+        apiKey = decryptAPIKey(storedApiKey); // hier entschlüsseln
+        qDebug() << "apiKey entschlüsselt: " << apiKey;
+    }
+    else {
+        apiKey.clear();
+    }
+    // int apiIndex = settings->value("ChosenAPIIndex", 0).toInt();
     // Prüfen, ob ein API-Index bereits gespeichert ist
     QVariant savedIndex = settings->value("ChosenAPIIndex");
 
@@ -154,7 +172,13 @@ void Controller::writeSettings(QSize size, QPoint pos, QString userID, QString g
     if ( !gameID.isEmpty() )
         settings->setValue("GameID", gameID);
     settings->setValue("JPEGQuality", jpegQuality);
-    settings->setValue("ApiKey", apiKey);
+
+    // settings->setValue("ApiKey", apiKey);
+
+    // API-Key verschlüsseln
+    if (!apiKey.isEmpty())
+        settings->setValue("ApiKey", encryptAPIKey(apiKey));
+
     settings->setValue("ChosenAPIIndex", apiIndex);
     settings->endGroup();
 
@@ -328,7 +352,7 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
             QNetworkAccessManager *nam = new QNetworkAccessManager(this);
 
             if (apiIndex == 1) {
-                qDebug() << "Alte API V1 gewählt, API-Key: " << apiKey;
+                qDebug() << "Alte API V1 gewählt, API-Key (entschlüsselt): " << apiKey;
 
                     // http://api.steampowered.com/<interface name>/<method name>/v<version>/?key=<api key>&format=<format>
                     QUrl url("https://api.steampowered.com/IStoreService/GetAppList/v1");
@@ -1331,7 +1355,8 @@ void Controller::setApiKey(QString key){
 
     if (settings) {
         settings->beginGroup("LastSelection");
-        settings->setValue("ApiKey", apiKey);
+        settings->setValue("ApiKey", encryptAPIKey(apiKey));
+        //settings->setValue("ApiKey", apiKey);
         settings->endGroup();
     }
 }
@@ -1501,6 +1526,48 @@ void Controller::parseJson(const QByteArray &raw)
     fillGameIDs(userID);
 }
 
+
+QString Controller::encryptAPIKey(const QString &plain)
+{
+    QByteArray data = plain.toUtf8();
+
+    // PKCS7 Padding auf 16-Byte-Blöcke
+    int pad = 16 - (data.size() % 16);
+    data.append(pad, char(pad));
+
+    QByteArray buffer = data;
+
+    struct AES_ctx ctx;
+    AES_init_ctx_iv(&ctx, AES_KEY, AES_IV);
+
+    AES_CBC_encrypt_buffer(&ctx,
+                           reinterpret_cast<uint8_t*>(buffer.data()),
+                           buffer.size());
+
+    return buffer.toBase64();
+}
+
+QString Controller::decryptAPIKey(const QString &enc)
+{
+    QByteArray buffer = QByteArray::fromBase64(enc.toUtf8());
+
+    struct AES_ctx ctx;
+    AES_init_ctx_iv(&ctx, AES_KEY, AES_IV);
+
+    AES_CBC_decrypt_buffer(&ctx,
+                           reinterpret_cast<uint8_t*>(buffer.data()),
+                           buffer.size());
+
+    // Padding entfernen
+    if (!buffer.isEmpty()) {
+        int pad = buffer.at(buffer.size() - 1);
+        if (pad > 0 && pad <= 16) {
+            buffer.chop(pad);
+        }
+    }
+
+    return QString::fromUtf8(buffer);
+}
 
 
 

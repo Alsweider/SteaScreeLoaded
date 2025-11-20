@@ -127,7 +127,7 @@ private slots:
     void on_comboBox_chooseAPI_currentIndexChanged(int index);
     void on_pushButtonClearKey_clicked();
     void on_pushButtonResetName_clicked();
-    void on_horizontalSliderScreenshots_valueChanged(int value);
+  //  void on_horizontalSliderScreenshots_valueChanged(int value);
     void on_horizontalScrollBarScreenshots_valueChanged(int value);
     void on_actionReset_settings_triggered();
     void on_actionDelete_settings_triggered();

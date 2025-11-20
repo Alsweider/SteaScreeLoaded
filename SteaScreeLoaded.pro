@@ -9,14 +9,17 @@ SOURCES     +=  main.cpp\
                 controller.cpp \
                 largefiledialog.cpp \
                 interfaceadjuster.cpp \
-                qtreewidgetdraganddrop.cpp
+                qtreewidgetdraganddrop.cpp \
+                aes.c
 
 HEADERS     +=  mainwindow.h \
                 controller.h \
                 largefiledialog.h \
                 interfaceadjuster.h \
                 screenshot.h \
-                qtreewidgetdraganddrop.h
+                qtreewidgetdraganddrop.h \
+                aes.h \
+                aes.hpp
 
 FORMS       +=  mainwindow.ui \
                 largefiledialog.ui
@@ -24,7 +27,7 @@ FORMS       +=  mainwindow.ui \
 RESOURCES   +=  \
                 images.qrc
 
-VERSION     =   1.19.1
+VERSION     =   1.20.0
 
 DEFINES     +=  APP_VERSION=\\\"$$VERSION\\\"
 DEFINES     += APP_NAME=\\\"$$TARGET\\\"
