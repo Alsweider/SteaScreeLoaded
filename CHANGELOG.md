@@ -1,5 +1,8 @@
 # SteaScreeLoaded Changelog
 
+## 1.20.1
+Footer and About section revised.
+
 ## 1.20.0
 API key obfuscation added: the key is now encrypted and decrypted using [Tiny-AES](https://github.com/kokke/tiny-AES-c) (AES-256), so it no longer appears in plain text in the settings file. Since the encryption key is not tied to a specific user (no individual password is required), this does not protect against determined attackers, but it prevents the merely curious, basic malware, scripts, third-party applications and file scanners from reading it easily and generating unwanted traffic that could trigger the key's suspension. As the Steam API key does not permit any security-critical actions, this should be an appropriate safeguard that imposes no additional burden on the user.
 
