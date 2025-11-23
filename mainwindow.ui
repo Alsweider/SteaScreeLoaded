@@ -497,12 +497,12 @@
                </item>
                <item>
                 <property name="text">
-                 <string>None (local only)</string>
+                 <string>Offline mode (local only)</string>
                 </property>
                </item>
                <item>
                 <property name="text">
-                 <string>Local JSON file (download from mirror)</string>
+                 <string>Download JSON file (12 MB)</string>
                 </property>
                </item>
               </widget>

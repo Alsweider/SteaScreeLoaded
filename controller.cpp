@@ -115,11 +115,27 @@ void Controller::readSettings()
     QString storedApiKey = settings->value("ApiKey").toString();
     qDebug() << "Verschlüsselter apiKey: " << storedApiKey;
     if (!storedApiKey.isEmpty()){
-        apiKey = decryptAPIKey(storedApiKey); // hier entschlüsseln
-        qDebug() << "apiKey entschlüsselt: " << apiKey;
+        // Prüfen, ob es nach Base64 aussieht
+        QRegularExpression base64Regex("^[A-Za-z0-9+/=]+$");
+        if (base64Regex.match(storedApiKey).hasMatch() && storedApiKey.length() > 32) {
+            // Vermutlich verschlüsselt
+            apiKey = decryptAPIKey(storedApiKey);
+            qDebug() << "API-Key entschlüsselt:" << apiKey;
+        } else {
+            // Klartext-Key aus älterer Version
+            apiKey = storedApiKey;
+            qDebug() << "Klartext-API-Key gefunden:" << apiKey;
+            // Sofort verschlüsselt speichern, um Migration abzuschließen
+            settings->setValue("ApiKey", encryptAPIKey(apiKey));
+        }
+
+
+        // apiKey = decryptAPIKey(storedApiKey); // hier entschlüsseln
+        // qDebug() << "apiKey entschlüsselt: " << apiKey;
     }
     else {
         apiKey.clear();
+        qDebug() << "Kein API-Key vorhanden.";
     }
     // int apiIndex = settings->value("ChosenAPIIndex", 0).toInt();
     // Prüfen, ob ein API-Index bereits gespeichert ist
@@ -409,8 +425,15 @@ void Controller::setUserDataPaths(QString dir)  // function to validate and set 
 
                     // nam->get(QNetworkRequest(url));
             } else if (apiIndex == 2){ //Keine externen API-Anfragen //  (apiIndex == 2)
-                qDebug() << "Index " << apiIndex << ". Keine API-Anfragen, nur lokale IDs nutzen";
-                fillGameIDs(userID);
+                qDebug() << "Index " << apiIndex << ". Keine API-Anfragen, nur lokale Informationen nutzen";
+
+                QByteArray localJson = loadJsonLocal().toUtf8();
+                if (!localJson.isEmpty()) {
+                    parseJson(localJson);
+                } else {
+                    fillGameIDs(userID);
+                }
+
             } else if (apiIndex == 3) {
                 // JSON laden
                 qDebug() << "API = JSON local/mirror";
