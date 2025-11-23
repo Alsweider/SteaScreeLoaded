@@ -610,8 +610,8 @@ void MainWindow::setController(Controller *ctrl)
 }
 
 
-void MainWindow::setFooter(){
-
+void MainWindow::setFooter()
+{
     ui->labelFooter->clear();
 
     // Links klickbar machen
@@ -619,23 +619,57 @@ void MainWindow::setFooter(){
     ui->labelFooter->setTextInteractionFlags(Qt::TextBrowserInteraction);
     ui->labelFooter->setOpenExternalLinks(true);
 
-    // Stilfarbe
+    // Schriftfarbe
     ui->labelFooter->setStyleSheet("color: grey");
 
-        QStringList icons = { "🎁", "🔔", "🏺", "★", "♥", "✦","🌱",
-                             "⭐", "🍃", "✨", "🌳", "⚜️", "❧", "❦",
-                             "✽", "❂", "🐝", "🍯", "🐻", "🐺", "🦉"};
-        QString iconDonations = icons.at(QRandomGenerator::global()->bounded(icons.size()));
-        QString iconDonationsColour = "#D4AF37";
+    // Zeit und Datum
+    QTime now = QTime::currentTime();
+    bool isNight = (now.hour() >= 20 || now.hour() < 6);
+    QDate today = QDate::currentDate();
+    bool isAdvent = (today.month() == 12 && today.day() >= 1 && today.day() <= 26);
 
+    QStringList icons;
+
+    // Grundmenge: Tages- oder Nachtzeichen
+    if (isNight) {
+        icons = { "🦉", "🌙" };
+    } else {
+        icons = {
+            "🔔", "🏺", "★", "♥", "✦", "🌱",
+            "⭐", "🍃", "✨", "🌳", "⚜️", "❧", "❦",
+            "✽", "❂", "🐝", "🍯", "🐻", "🐺"
+        };
+    }
+
+    // In der Adventszeit zusätzliche Weihnachtszeichen beimischen
+    if (isAdvent) {
+        icons << QStringList{ "🎄", "🎅", "❄️", "⛄", "🎁" };
+    }
+
+    // Sicherheit: niemals leere Liste
+    if (icons.isEmpty()) {
+        icons << "★";
+    }
+
+    // Zufälliges Icon
+    int idx = QRandomGenerator::global()->bounded(icons.size());
+    const QString iconDonations = icons.at(idx);
+
+    // Farben (gold oder Advent-rot)
+    QString iconColour = isAdvent ? "#B22222" : "#D4AF37";
+
+    // Footer
     QString footer = QString(
-                         "<span style='color: grey; text-decoration: none;'>"
-                         "<a href='https://github.com/Alsweider/SteaScreeLoaded' style='text-decoration: none;'>%1</a> "
+                         "<span style='color: grey;'>"
+                         "<a href='https://github.com/Alsweider/SteaScreeLoaded' style='color: inherit; text-decoration: none;'>%1</a> "
                          "v%2 by Alsweider, © 2025"
                          "</span>"
-                         " <br> "
-                         "<a href='https://ko-fi.com/alsweider' style='text-decoration: none;'><span style='color: %3;'>%4</span> 𝒮upport ₰evelopment</a>"
-                         ).arg(progName, progVersion, iconDonationsColour, iconDonations);
+                         "<br>"
+                         "<a href='https://ko-fi.com/alsweider' style='text-decoration: none;'>"
+                         "<span style='color: %3;'>%4</span> "
+                         "<span style='color: inherit;'>𝒮upport ₰evelopment</span>"
+                         "</a>"
+                         ).arg(progName, progVersion, iconColour, iconDonations);
 
     ui->labelFooter->setText(footer);
 }
@@ -1053,15 +1087,17 @@ void MainWindow::on_action_About_triggered()
     // Haupttext
     QLabel *label = new QLabel(
         "<h3>SteaScreeLoaded " + progVersion + "</h3>"
-        "<p>A Steam cloud screenshot upload helper.</p>"
-        "<p>&copy; 2025 <a href=\"https://github.com/Alsweider\">Alsweider</a></p>"
-        "<p><a href=\"https://github.com/Alsweider/SteaScreeLoaded\">SteaScreeLoaded</a> is a fork based on <a href=\"https://github.com/awthwathje/SteaScree\">SteaScree</a> by Foyl "
-        "and is licensed under the "
-        "<a href=\"https://www.gnu.org/licenses/gpl-3.0.html.en\">GNU GPL 3.0</a>.</p>"
-        "<hr>"
-        "<p>If you enjoy using this software, you are welcome to support the author:</p>"
-        "<p>Ko-Fi: <a href=\"https://ko-fi.com/alsweider\">https://ko-fi.com/alsweider</a></p>"
-        "<p>Monero (XMR):</p>"
+                                               "<p>A Steam cloud screenshot upload helper.</p>"
+                                               "<p>&copy; 2025 <a href=\"https://github.com/Alsweider\">Alsweider</a></p>"
+                                               "<p><a href=\"https://github.com/Alsweider/SteaScreeLoaded\">SteaScreeLoaded</a> is a fork based on <a href=\"https://github.com/awthwathje/SteaScree\">SteaScree</a> by Foyl "
+                                               "and is licensed under the "
+                                               "<a href=\"https://www.gnu.org/licenses/gpl-3.0.html.en\">GNU GPL 3.0</a>.</p>"
+                                               "<p>Developed in C++ and Qt Framework.</p>"
+                                               "<p>Storage of API keys protected with <a href=\"https://github.com/kokke/tiny-AES-c\">tiny-AES-c</a> using AES-256-CBC encryption.</p>"
+                                               "<hr>"
+                                               "<p>If you enjoy using this software, you are welcome to support the author:</p>"
+                                               "<p>Ko-Fi: <a href=\"https://ko-fi.com/alsweider\">https://ko-fi.com/alsweider</a></p>"
+                                               "<p>Monero (XMR):</p>"
         );
     label->setTextFormat(Qt::RichText);
     label->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
