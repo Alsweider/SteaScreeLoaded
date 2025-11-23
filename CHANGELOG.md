@@ -4,7 +4,7 @@
 - Should a settings file from an earlier version be used, in which the API key was still stored unencrypted, it is now immediately usable and automatically encrypted. Previously, the key had to be manually re-entered. 
 - The game-sources mode formerly named "None (Local only)" is now called "Offline mode" and also uses the `games.json` in the programme directory, if present.
 - "Local JSON file" is now called "Download JSON file" and behaves like Offline mode, but unlike it, establishes Internet connections to check the availability of the JSON file and download it if it is not already present.
-- 
+
 ## 1.20.1
 Footer and About section revised.
 
