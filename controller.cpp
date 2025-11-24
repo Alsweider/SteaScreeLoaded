@@ -67,8 +67,12 @@ void Controller::bootStrap()
     }
 
     readSettings(); // read settings from the file, if any
-    if (offerUpdateSetting != "Never")
-        checkForUpdates();
+
+    if (offerUpdateSetting != "Never"){ // Kein Update, wenn Benutzer Never festgelegt hat
+        if (apiIndex != 2){ // Kein automatisches Update im Offline-Modus
+            checkForUpdates();
+        }
+    }
 
     if (!screenshotPathsPool.isEmpty()) {
         populateScreenshotQueue(screenshotPathsPool);
@@ -128,9 +132,6 @@ void Controller::readSettings()
             // Sofort verschlüsselt speichern, um Migration abzuschließen
             settings->setValue("ApiKey", encryptAPIKey(apiKey));
         }
-
-
-        // apiKey = decryptAPIKey(storedApiKey); // hier entschlüsseln
         // qDebug() << "apiKey entschlüsselt: " << apiKey;
     }
     else {
@@ -1593,4 +1594,12 @@ QString Controller::decryptAPIKey(const QString &enc)
 }
 
 
+QString Controller::getCurrentScreenshotPath() const
+{
+    if (lastSelectedScreenshotPath.isEmpty() || m_screenshotFiles.isEmpty())
+        return QString();
+
+    return QDir(lastSelectedScreenshotPath)
+        .absoluteFilePath(m_screenshotFiles[m_currentScreenshotIndex]);
+}
 

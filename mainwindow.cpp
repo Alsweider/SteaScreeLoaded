@@ -119,6 +119,17 @@ void MainWindow::showPreviewImage(QPixmap pixmap)
 
     m_previewOriginal = pixmap;
 
+    // Aufnahmedatum anzeigen
+    if (controller) {
+        QString path = controller->getCurrentScreenshotPath();
+        if (!path.isEmpty()) {
+            QFileInfo info(path);
+            //QString date = info.birthTime().toString("yyyy-MM-dd hh:mm:ss");
+            QString date = info.birthTime().toString("d MMMM yyyy, HH:mm:ss");
+            ui->label_previewDate->setText("Captured On: " + date);
+        }
+    }
+
     QPixmap scaled = pixmap.scaled(
         ui->pushButtonPreview->size(),
         Qt::KeepAspectRatio,
@@ -635,9 +646,9 @@ void MainWindow::setFooter()
         icons = { "🦉", "🌙" };
     } else {
         icons = {
-            "🔔", "🏺", "★", "♥", "✦", "🌱",
+            "🔔", "🏺", "★", "❤️", "✦", "🌱",
             "⭐", "🍃", "✨", "🌳", "⚜️", "❧", "❦",
-            "✽", "❂", "🐝", "🍯", "🐻", "🐺"
+            "✽", "❂", "🐝", "🍯", "🐻", "🐺", "🌞"
         };
     }
 

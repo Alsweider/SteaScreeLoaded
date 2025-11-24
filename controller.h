@@ -25,6 +25,8 @@ public:
     bool resetOnClose = false;
     QSettings *settings;
     void checkForUpdates();
+    QString getCurrentScreenshotPath() const;
+
 
 
 private:
