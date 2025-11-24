@@ -1,5 +1,9 @@
 # SteaScreeLoaded Changelog
 
+## 1.22.0
+- No automatic update check in offline mode anymore.
+- The preview area now displays the creation time of each screenshot.
+
 ## 1.21.0
 - Should a settings file from an earlier version be used, in which the API key was still stored unencrypted, it is now immediately usable and automatically encrypted. Previously, the key had to be manually re-entered. 
 - The game-sources mode formerly named "None (Local only)" is now called "Offline mode" and also uses the `games.json` in the programme directory, if present.
