@@ -1,5 +1,8 @@
 # SteaScreeLoaded Changelog
 
+## 1.23.0
+Added a setting to disable the footer.
+
 ## 1.22.0
 - No automatic update check in offline mode anymore.
 - The preview area now displays the creation time of each screenshot.
