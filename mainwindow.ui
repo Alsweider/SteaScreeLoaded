@@ -1191,6 +1191,7 @@
     <addaction name="actionOpen_settings"/>
     <addaction name="actionReset_settings"/>
     <addaction name="actionDelete_settings"/>
+    <addaction name="actionFooter_on_off"/>
    </widget>
    <widget class="QMenu" name="menu_Info">
     <property name="title">
@@ -1262,6 +1263,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionFooter_on_off">
+   <property name="text">
+    <string>Footer on/off</string>
    </property>
   </action>
  </widget>

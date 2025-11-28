@@ -26,6 +26,7 @@ public:
     QSettings *settings;
     void checkForUpdates();
     QString getCurrentScreenshotPath() const;
+    bool footerVisible = true;
 
 
 
@@ -149,6 +150,8 @@ signals:
     void apiReachabilityChanged(bool erreichbar);
     //void settingsReset();
     void updateStatusMessage(const QString &message);
+    void loadFooterState(bool footer);
+
 
 
 public slots:

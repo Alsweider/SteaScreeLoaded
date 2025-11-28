@@ -110,6 +110,8 @@ public slots:
     void receiveApiKeyState(bool exists);
     void showOrHideApiSettings(int index);
     void onApiReachabilityChanged(bool erreichbar);
+    void onLoadFooterState(bool footer);
+
 
 
 private slots:
@@ -135,6 +137,7 @@ private slots:
     void on_action_Update_triggered();
     void on_action_About_triggered();
 
+    void on_actionFooter_on_off_triggered();
 };
 
 #endif // MAINWINDOW_H

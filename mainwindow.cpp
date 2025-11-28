@@ -104,7 +104,10 @@ void MainWindow::bootStrap()
     completer->setCompletionMode(QCompleter::PopupCompletion); // Vorschläge in Dropdown anzeigen
     ui->comboBox_gameID->setCompleter(completer);
 
+
+    if (controller->footerVisible){
     setFooter();
+    }
 }
 
 
@@ -623,6 +626,7 @@ void MainWindow::setController(Controller *ctrl)
 
 void MainWindow::setFooter()
 {
+    if (controller->footerVisible){
     ui->labelFooter->clear();
 
     // Links klickbar machen
@@ -683,6 +687,10 @@ void MainWindow::setFooter()
                          ).arg(progName, progVersion, iconColour, iconDonations);
 
     ui->labelFooter->setText(footer);
+    } else {
+        ui->labelFooter->setEnabled(false);
+        ui->labelFooter->setVisible(false);
+    }
 }
 
 
@@ -1226,3 +1234,25 @@ bool MainWindow::isSteamRunning()
 
 
 
+
+void MainWindow::on_actionFooter_on_off_triggered()
+{
+    controller->footerVisible = !controller->footerVisible;
+    onLoadFooterState(controller->footerVisible);
+}
+
+
+void MainWindow::onLoadFooterState(bool footer){
+    if (footer){
+        qDebug() << "Footer: " << controller->footerVisible;
+        ui->labelFooter->setEnabled(true);
+        ui->labelFooter->setVisible(true);
+        setFooter();
+        ui->statusBar->showMessage("Footer enabled.", 5000);
+    } else {
+        qDebug() << "Footer: " << controller->footerVisible;
+        ui->labelFooter->setEnabled(false);
+        ui->labelFooter->setVisible(false);
+        ui->statusBar->showMessage("Footer disabled.", 5000);
+    }
+}

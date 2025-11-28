@@ -171,6 +171,12 @@ void Controller::readSettings()
     offerUpdateSetting = settings->value("Offer").toString();
     settings->endGroup();
 
+    settings->beginGroup("WindowPreferences");
+    footerVisible = settings->value("footer", true).toBool(); // Standard: true
+    settings->endGroup();
+
+    emit loadFooterState(footerVisible);
+
 }
 
 
@@ -201,6 +207,10 @@ void Controller::writeSettings(QSize size, QPoint pos, QString userID, QString g
 
     settings->beginGroup("Screenshots");
     settings->setValue("Queue", screenshotPathsPool);
+    settings->endGroup();
+
+    settings->beginGroup("WindowPreferences");
+    settings->setValue("footer", footerVisible);
     settings->endGroup();
 }
 

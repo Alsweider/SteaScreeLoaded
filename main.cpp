@@ -209,6 +209,9 @@ int main(int argc, char *argv[])
     QObject::connect(c, &Controller::sendApiIndex,
                      &w, &MainWindow::showOrHideApiSettings);
 
+    QObject::connect(c, &Controller::loadFooterState,
+                     &w, &MainWindow::onLoadFooterState);
+
 
 
 

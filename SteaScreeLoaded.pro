@@ -27,10 +27,10 @@ FORMS       +=  mainwindow.ui \
 RESOURCES   +=  \
                 images.qrc
 
-VERSION     =   1.22.0
+VERSION     =   1.23.0
 
 DEFINES     +=  APP_VERSION=\\\"$$VERSION\\\"
-DEFINES     += APP_NAME=\\\"$$TARGET\\\"
+DEFINES     +=  APP_NAME=\\\"$$TARGET\\\"
 
 macx:ICON   =   res/icons/SteaScree.icns
 
