@@ -1,7 +1,7 @@
 # SteaScreeLoaded Changelog
 
 ## 1.23.1
-- Corrected the position of the loading animation (`gifLoader` in `label_progress`) so that it now appears properly as part of the status layout (to the left of the progress bar) when copying screenshots. Previously, the label had a fixed position in the top-left corner of the main window, which meant the animation could be obscured by other elements.
+- Corrected the position of the loading animation (`gifLoader` in `label_progress`) so that it now appears properly as part of the status layout (to the left of the progress bar) when copying screenshots. Previously, the label had a fixed absolute position in the top-left corner of the main window, which meant the animation could be obscured by other elements.
   
 ## 1.23.0
 - Added a setting to disable the footer.
