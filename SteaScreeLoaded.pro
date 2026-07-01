@@ -27,7 +27,7 @@ FORMS       +=  mainwindow.ui \
 RESOURCES   +=  \
                 images.qrc
 
-VERSION     =   1.23.0
+VERSION     =   1.23.1
 
 DEFINES     +=  APP_VERSION=\\\"$$VERSION\\\"
 DEFINES     +=  APP_NAME=\\\"$$TARGET\\\"

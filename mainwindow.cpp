@@ -677,7 +677,7 @@ void MainWindow::setFooter()
     QString footer = QString(
                          "<span style='color: grey;'>"
                          "<a href='https://github.com/Alsweider/SteaScreeLoaded' style='color: inherit; text-decoration: none;'>%1</a> "
-                         "v%2 by Alsweider, © 2025"
+                         "v%2 by Alsweider, © 2025-2026"
                          "</span>"
                          "<br>"
                          "<a href='https://ko-fi.com/alsweider' style='text-decoration: none;'>"
@@ -1107,7 +1107,7 @@ void MainWindow::on_action_About_triggered()
     QLabel *label = new QLabel(
         "<h3>SteaScreeLoaded " + progVersion + "</h3>"
                                                "<p>A Steam cloud screenshot upload helper.</p>"
-                                               "<p>&copy; 2025 <a href=\"https://github.com/Alsweider\">Alsweider</a></p>"
+                                               "<p>&copy; 2025-2026 <a href=\"https://github.com/Alsweider\">Alsweider</a></p>"
                                                "<p><a href=\"https://github.com/Alsweider/SteaScreeLoaded\">SteaScreeLoaded</a> is a fork based on <a href=\"https://github.com/awthwathje/SteaScree\">SteaScree</a> by Foyl "
                                                "and is licensed under the "
                                                "<a href=\"https://www.gnu.org/licenses/gpl-3.0.html.en\">GNU GPL 3.0</a>.</p>"
