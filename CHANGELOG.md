@@ -1,7 +1,10 @@
 # SteaScreeLoaded Changelog
 
+## 1.23.1
+- Corrected the position of the loading animation (`gifLoader` in `label_progress`) so that it now appears properly as part of the status layout (to the left of the progress bar) when copying screenshots. Previously, the label had a fixed position in the top-left corner of the main window, which meant the animation could be obscured by other elements.
+  
 ## 1.23.0
-Added a setting to disable the footer.
+- Added a setting to disable the footer.
 
 ## 1.22.0
 - No automatic update check in offline mode anymore.
@@ -13,16 +16,16 @@ Added a setting to disable the footer.
 - "Local JSON file" is now called "Download JSON file" and behaves like Offline mode, but unlike it, establishes Internet connections to check the availability of the JSON file and download it if it is not already present.
 
 ## 1.20.1
-Footer and About section revised.
+- Footer and About section revised.
 
 ## 1.20.0
-API key obfuscation added: the key is now encrypted and decrypted using [Tiny-AES](https://github.com/kokke/tiny-AES-c) (AES-256), so it no longer appears in plain text in the settings file. Since the encryption key is not tied to a specific user (no individual password is required), this does not protect against determined attackers, but it prevents the merely curious, basic malware, scripts, third-party applications and file scanners from reading it easily and generating unwanted traffic that could trigger the key's suspension. As the Steam API key does not permit any security-critical actions, this should be an appropriate safeguard that imposes no additional burden on the user.
+- API key obfuscation added: the key is now encrypted and decrypted using [Tiny-AES](https://github.com/kokke/tiny-AES-c) (AES-256), so it no longer appears in plain text in the settings file. Since the encryption key is not tied to a specific user (no individual password is required), this does not protect against determined attackers, but it prevents the merely curious, basic malware, scripts, third-party applications and file scanners from reading it easily and generating unwanted traffic that could trigger the key's suspension. As the Steam API key does not permit any security-critical actions, this should be an appropriate safeguard that imposes no additional burden on the user.
 
 ## 1.19.1
-Corrected the order of the preview images: the oldest images are on the left and the newest on the right. "Age" does not refer to the date of copying or uploading, but to the moment the original file was created. This moment determines the file name in the screenshot folder, and that file name in turn forms the basis of the sorting. This means that if an older image is copied into the screenshot folder using the programme, it will not appear on the far right, but in the position corresponding to its timestamp. When switching the game in the game-ID list and when starting the programme, the view is first moved to the newest image on the far right, which quite naturally is not necessarily the one most recently copied.
+- Corrected the order of the preview images: the oldest images are on the left and the newest on the right. "Age" does not refer to the date of copying or uploading, but to the moment the original file was created. This moment determines the file name in the screenshot folder, and that file name in turn forms the basis of the sorting. This means that if an older image is copied into the screenshot folder using the programme, it will not appear on the far right, but in the position corresponding to its timestamp. When switching the game in the game-ID list and when starting the programme, the view is first moved to the newest image on the far right, which quite naturally is not necessarily the one most recently copied.
 
 ## 1.19.0
-Load game names more reliably and quickly: Under "Games source", you can now select "Local JSON file". This will download a JSON of roughly 12 MB into the programme folder. Once present, the game names will be immediately available at every start.
+- Load game names more reliably and quickly: Under "Games source", you can now select "Local JSON file". This will download a JSON of roughly 12 MB into the programme folder. Once present, the game names will be immediately available at every start.
 The JSON is a stripped-down mirror of the old API [ISteamApps/GetAppList/v1](https://api.steampowered.com/ISteamApps/GetAppList/v1), meaning it may be out of date, but in most cases it should currently be the best option. The JSON schema is `{"ID": "Name", "ID2": "Name 2"}`, for example:
 
 `{
@@ -52,14 +55,14 @@ The JSON is a stripped-down mirror of the old API [ISteamApps/GetAppList/v1](htt
 - Menu added: Update, Settings (Open/Reset/Delete), About, Quit.
 
 ## 1.15.1
-Bug fixed: After restarting, the API settings remained visible even when the selected API did not require any settings.
+- Bug fixed: After restarting, the API settings remained visible even when the selected API did not require any settings.
 
 ## 1.15.0
 - API settings are now only displayed when required.
 - Next to the API selection, the server availability is now shown: green dot = reachable, red circle = not reachable.
 
 ## 1.14.1
-API switching bug fixed: A redeclaration of a global variable (the index of the API selection list) as a local variable within a method had prevented reliable switching between APIs. The index loaded from the settings file appeared to be applied, yet was in fact not used by the programme. Instead, the default index was taken. This created the impression that the open Steam API V2 was functioning once more, although it is presently unreachable.
+- API switching bug fixed: A redeclaration of a global variable (the index of the API selection list) as a local variable within a method had prevented reliable switching between APIs. The index loaded from the settings file appeared to be applied, yet was in fact not used by the programme. Instead, the default index was taken. This created the impression that the open Steam API V2 was functioning once more, although it is presently unreachable.
 
 ## 1.14.0
 - To spare the clicking finger, the buttons for jumping to the next/previous preview image were replaced with a scroll bar.
@@ -72,23 +75,23 @@ API switching bug fixed: A redeclaration of a global variable (the index of the 
 - Fixed a scaling issue of the preview screenshot after startup.
 
 ## 1.12.1
-Bug fix: Endless "loading..." in the game ID list and no IDs on first launch.
+- Bug fix: Endless "loading..." in the game ID list and no IDs on first launch.
 
 ## 1.12.0
 - Selection of the source (API) from which the game names shall be downloaded.
 - Button for removing the Steam API key from the settings.
 
 ## 1.11.0
-Quick fix for the games list: It is now possible to add your own [Steam API key](https://steamcommunity.com/dev/apikey).
+- Quick fix for the games list: It is now possible to add your own [Steam API key](https://steamcommunity.com/dev/apikey).
 Background: Steam has closed open access to [API v2](https://api.steampowered.com/IStoreService/GetAppList/v2/) without prior notice. As a result, game names can no longer be fetched from the original source. This may happen from time to time. With a personal API key, however, it is possible to load many of the missing names from the older [API v1](https://api.steampowered.com/IStoreService/GetAppList/v1/).
 
 ![2025-11-14 16_40_50-SteaScreeLoaded](https://github.com/user-attachments/assets/29d25146-e0d5-42dd-8f84-dd7e59892bc7)
 
 ## 1.10.1
-Steam API requests have been switched from http to https. This is the officially recommended option and offers a degree of protection against interception, falsification, and manipulation of connection data through encryption of data transmission.
+- Steam API requests have been switched from http to https. This is the officially recommended option and offers a degree of protection against interception, falsification, and manipulation of connection data through encryption of data transmission.
 
 ## 1.10.0
-Autocomplete added for the Game ID input field. As soon as a game or ID is typed, matching entries from the list are immediately suggested for selection.
+- Autocomplete added for the Game ID input field. As soon as a game or ID is typed, matching entries from the list are immediately suggested for selection.
 
 ## 1.9.0
 - Arrow buttons for navigating the preview image added
@@ -107,14 +110,14 @@ Non-Steam games added as shortcuts in the Steam client often appear in the list 
 - A splitter has been added, dividing the user interface vertically into two halves to allow the image size to be modified.
 
 ## 1.7.0
-The preview image of the selected game now opens the corresponding screenshot folder when clicked.
+- The preview image of the selected game now opens the corresponding screenshot folder when clicked.
 
 ## 1.6.2
 - New update feature that retrieves the latest version from GitHub
 - Footer information
 
 ## 1.6.1
-User interface more clearly organised
+- User interface more clearly organised
 
 ## 1.6.0
 - Image preview: Some games appear in the list only with their ID number. To make folder selection easier, an image is now displayed as soon as a game/ID is selected in the list. The user interface has been rearranged accordingly.
